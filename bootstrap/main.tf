@@ -66,9 +66,18 @@ resource "azuread_application_federated_identity_credential" "github" {
   application_id = azuread_application.github_oidc.id # ✅ NEW: replaces deprecated `application_object_id`
   display_name   = "github-actions"
   issuer         = "https://token.actions.githubusercontent.com"
-  subject        = "repo:${var.github_owner}/${var.github_repo}:ref:refs/heads/*"
+  subject        = "repo:${var.github_owner}/${var.github_repo}:ref:refs/heads/main"
   audiences      = ["api://AzureADTokenExchange"]
 }
+
+resource "azuread_application_federated_identity_credential" "github-production" {
+  application_id = azuread_application.github_oidc.id # ✅ NEW: replaces deprecated `application_object_id`
+  display_name   = "github-actions-production"
+  issuer         = "https://token.actions.githubusercontent.com"
+  subject        = "repo:${var.github_owner}/${var.github_repo}:environment:production"
+  audiences      = ["api://AzureADTokenExchange"]
+}
+
 
 data "azurerm_subscription" "current" {}
 

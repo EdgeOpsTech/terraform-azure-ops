@@ -7,6 +7,12 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      working_dir:
+        description: "Terraform working directory"
+        required: false
+        default: "infra"
 
 permissions:
   id-token: write
@@ -14,6 +20,7 @@ permissions:
   pull-requests: write
 
 env:
+  WORKING_DIR: ${{ github.event.inputs.working_dir || 'infra' }}
   ARM_CLIENT_ID: "${{ secrets.ARM_CLIENT_ID }}"
   ARM_SUBSCRIPTION_ID: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
   ARM_TENANT_ID: "${{ secrets.ARM_TENANT_ID }}"
@@ -41,11 +48,11 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: infra
+        working-directory: ${{ env.WORKING_DIR }}
 
       - name: Terraform Format
         run: terraform fmt -check
-        working-directory: infra
+        working-directory: ${{ env.WORKING_DIR }}
 
       # - name: Terraform Plan
       #   id: tf-plan
@@ -79,7 +86,7 @@ jobs:
           else 
             exit 0
           fi
-        working-directory: infra
+        working-directory: ${{ env.WORKING_DIR }}
 
       - name: Publish Terraform Plan
         uses: actions/upload-artifact@v4
@@ -101,7 +108,7 @@ jobs:
           echo '```' >> $GITHUB_OUTPUT
           echo "</details>" >> $GITHUB_OUTPUT
           echo "${delimiter}" >> $GITHUB_OUTPUT
-        working-directory: infra
+        working-directory: ${{ env.WORKING_DIR }}
 
       - name: Publish Terraform Plan to Task Summary
         env:
@@ -141,7 +148,7 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: infra
+        working-directory: ${{ env.WORKING_DIR }}
 
       - name: Download Terraform Plan
         uses: actions/download-artifact@v4
@@ -151,4 +158,4 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
-        working-directory: infra
+        working-directory: ${{ env.WORKING_DIR }}
