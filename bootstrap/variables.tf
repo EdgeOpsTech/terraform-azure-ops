@@ -25,11 +25,11 @@ variable "resource_group_name" {
 variable "github_owner" {
   type        = string
   description = "GitHub organisation / user that owns the repo (e.g. 'my‑org')"
-  default     = "devulapallyabinay"
+  default     = "EdgeOpsTech"
 }
 
 variable "github_repo" {
   type        = string
   description = "GitHub repository name (e.g. 'infra')"
-  default     = "terraform-infra"
+  default     = "terraform-azure-ops"
 }
