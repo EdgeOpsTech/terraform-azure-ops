@@ -7,36 +7,33 @@ on:
   pull_request:
     branches:
       - main
-  workflow_call:
+  workflow_dispatch:
     inputs:
       working_dir:
+        description: "Terraform working directory"
         required: false
-        type: string
+
         default: "infra"
-    secrets:
-      ARM_CLIENT_ID:
-        required: true
-      ARM_SUBSCRIPTION_ID:
-        required: true
-      ARM_TENANT_ID:
-        required: true
-      GH_PAT:
-        required: true # renamed from GITHUB_TOKEN to avoid conflict
 
 permissions:
   id-token: write
   contents: read
   pull-requests: write
 
+env:
+  WORKING_DIR: ${{ github.event.inputs.working_dir || 'infra' }}
+  ARM_CLIENT_ID: "${{ secrets.ARM_CLIENT_ID }}"
+  ARM_SUBSCRIPTION_ID: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
+  ARM_TENANT_ID: "${{ secrets.ARM_TENANT_ID }}"
+  ARM_USE_OIDC: true
+  REPO_NAME: "${{ github.event.repository.name }}"
+  REPO_OWNER: "${{ github.repository_owner }}"
+
 jobs:
   terraform-plan:
     name: "Terraform Plan"
     runs-on: ubuntu-latest
     env:
-      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-      ARM_USE_OIDC: true
       ARM_SKIP_PROVIDER_REGISTRATION: true
     outputs:
       tfplanExitCode: ${{ steps.tf-plan.outputs.exitcode }}
@@ -52,31 +49,51 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: ${{ inputs.working_dir }}
+        working-directory: ${{ env.WORKING_DIR }}
 
       - name: Terraform Format
         run: terraform fmt -check
-        working-directory: ${{ inputs.working_dir }}
+        working-directory: ${{ env.WORKING_DIR }}
+
+      # - name: Terraform Plan
+      #   id: tf-plan
+      #   run: |
+      #     export exitcode=0
+      #     terraform plan \
+      #       -var="github_owner=${{ env.REPO_OWNER }}" \
+      #       -var="github_repo=${{ env.REPO_NAME }}" \
+      #       -detailed-exitcode -no-color -out tfplan || export exitcode=$?
+      #     echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
+
+      #     if [ $exitcode -eq 1 ]; then
+      #       echo Terraform Plan Failed!
+      #       exit 1
+      #     else
+      #       exit 0
+      #     fi
+      #   working-directory: infra
 
       - name: Terraform Plan
         id: tf-plan
         run: |
           export exitcode=0
           terraform plan -detailed-exitcode -no-color -out tfplan || export exitcode=$?
+
           echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
+
           if [ $exitcode -eq 1 ]; then
             echo Terraform Plan Failed!
             exit 1
-          else
+          else 
             exit 0
           fi
-        working-directory: ${{ inputs.working_dir }}
+        working-directory: ${{ env.WORKING_DIR }}
 
       - name: Publish Terraform Plan
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: ${{ inputs.working_dir }}/tfplan
+          path: infra/tfplan
 
       - name: Create String Output
         id: tf-plan-string
@@ -92,12 +109,13 @@ jobs:
           echo '```' >> $GITHUB_OUTPUT
           echo "</details>" >> $GITHUB_OUTPUT
           echo "${delimiter}" >> $GITHUB_OUTPUT
-        working-directory: ${{ inputs.working_dir }}
+        working-directory: ${{ env.WORKING_DIR }}
 
       - name: Publish Terraform Plan to Task Summary
         env:
           SUMMARY: ${{ steps.tf-plan-string.outputs.summary }}
-        run: echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+        run: |
+          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
 
       - name: Push Terraform Output to PR
         if: github.ref != 'refs/heads/main'
@@ -105,7 +123,7 @@ jobs:
         env:
           SUMMARY: "${{ steps.tf-plan-string.outputs.summary }}"
         with:
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const body = `${process.env.SUMMARY}`;
             github.rest.issues.createComment({
@@ -131,14 +149,14 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: ${{ inputs.working_dir }}
+        working-directory: ${{ env.WORKING_DIR }}
 
       - name: Download Terraform Plan
         uses: actions/download-artifact@v4
         with:
           name: tfplan
-          path: ${{ inputs.working_dir }}
+          path: infra
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
-        working-directory: ${{ inputs.working_dir }}
+        working-directory: ${{ env.WORKING_DIR }}
