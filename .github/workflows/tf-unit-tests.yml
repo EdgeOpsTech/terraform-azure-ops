@@ -39,11 +39,19 @@ jobs:
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
 
+      # - name: Run Checkov Security Scan
+      #   id: checkov
+      #   uses: bridgecrewio/checkov-action@master
+      #   with:
+      #     framework: terraform
+
       - name: Run Checkov Security Scan
         id: checkov
         uses: bridgecrewio/checkov-action@master
         with:
+          directory: infra
           framework: terraform
+          output_format: sarif
 
       - name: Upload Checkov SARIF to GitHub Security
         if: always() # Upload regardless of success or failure
