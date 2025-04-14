@@ -48,6 +48,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check if working directory exists
+        run: test -d "${{ env.WORKING_DIR }}" || (echo "Directory ${{ env.WORKING_DIR }} not found!" && exit 1)
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -158,6 +161,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Check if working directory exists
+        run: test -d "${{ env.WORKING_DIR }}" || (echo "Directory ${{ env.WORKING_DIR }} not found!" && exit 1)
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
