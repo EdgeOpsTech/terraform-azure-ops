@@ -170,8 +170,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: tfplan
-          path: ${{ inputs.working_dir }}
+          path: ${{ env.WORKING_DIR }}
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve "${{ env.WORKING_DIR }}/tfplan"
         working-directory: ${{ env.WORKING_DIR }}
