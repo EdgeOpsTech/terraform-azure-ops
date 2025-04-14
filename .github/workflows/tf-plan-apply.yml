@@ -99,7 +99,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: ${{ inputs.working_dir }}/tfplan
+          path: ${{ env.WORKING_DIR }}/tfplan
 
       - name: Create String Output
         id: tf-plan-string
