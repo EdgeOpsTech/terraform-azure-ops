@@ -62,28 +62,37 @@ resource "azuread_service_principal" "github_oidc" {
   client_id = azuread_application.github_oidc.client_id
 }
 
-# resource "azuread_application_federated_identity_credential" "github" {
-#   application_id = azuread_application.github_oidc.id # ✅ NEW: replaces deprecated `application_object_id`
-#   display_name   = "github-actions"
-#   issuer         = "https://token.actions.githubusercontent.com"
-#   subject        = "repo:${var.github_owner}/${var.github_repo}:ref:refs/heads/main"
-#   audiences      = ["api://AzureADTokenExchange"]
-# }
+resource "azuread_application_federated_identity_credential" "github" {
+  application_id = azuread_application.github_oidc.id # ✅ NEW: replaces deprecated `application_object_id`
+  display_name   = "github-actions"
+  issuer         = "https://token.actions.githubusercontent.com"
+  subject        = "repo:${var.github_owner}/${var.github_repo}:ref:refs/heads/main"
+  audiences      = ["api://AzureADTokenExchange"]
+}
 
-# resource "azuread_application_federated_identity_credential" "github-production" {
-#   application_id = azuread_application.github_oidc.id # ✅ NEW: replaces deprecated `application_object_id`
-#   display_name   = "github-actions-production"
-#   issuer         = "https://token.actions.githubusercontent.com"
-#   subject        = "repo:${var.github_owner}/${var.github_repo}:environment:production"
-#   audiences      = ["api://AzureADTokenExchange"]
-# }
+resource "azuread_application_federated_identity_credential" "github-production" {
+  application_id = azuread_application.github_oidc.id # ✅ NEW: replaces deprecated `application_object_id`
+  display_name   = "github-actions-production"
+  issuer         = "https://token.actions.githubusercontent.com"
+  subject        = "repo:${var.github_owner}/${var.github_repo}:environment:production"
+  audiences      = ["api://AzureADTokenExchange"]
+}
 
 resource "azuread_application_federated_identity_credential" "github_prs" {
   application_id = azuread_application.github_oidc.id
   display_name   = "github-actions-pull-requests"
-  issuer         = "https://token.actions.githubusercontent.com"
-  subject        = "repo:${var.github_owner}/${var.github_repo}:*"
-  audiences      = ["api://AzureADTokenExchange"]
+
+  issuer    = "https://token.actions.githubusercontent.com"
+  subject   = "repo:EdgeOpsTech/terraform-azure-ops:pull_request"
+  audiences = ["api://AzureADTokenExchange"]
+}
+resource "azuread_application_federated_identity_credential" "github_prs-production" {
+  application_id = azuread_application.github_oidc.id
+  display_name   = "github-actions-pull-requests-production"
+
+  issuer    = "https://token.actions.githubusercontent.com"
+  subject   = "repo:EdgeOpsTech/terraform-azure-ops:pull_request:environment:production"
+  audiences = ["api://AzureADTokenExchange"]
 }
 
 data "azurerm_subscription" "current" {}
