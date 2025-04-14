@@ -61,7 +61,7 @@ resource "azuread_application" "github_oidc" {
 resource "azuread_service_principal" "github_oidc" {
   client_id = azuread_application.github_oidc.client_id
 }
-
+# Add Federated Identity Credentials for GitHub Actions
 resource "azuread_application_federated_identity_credential" "github" {
   application_id = azuread_application.github_oidc.id # ✅ NEW: replaces deprecated `application_object_id`
   display_name   = "github-actions"
@@ -78,6 +78,22 @@ resource "azuread_application_federated_identity_credential" "github-production"
   audiences      = ["api://AzureADTokenExchange"]
 }
 
+resource "azuread_application_federated_identity_credential" "github_prs" {
+  application_id = azuread_application.github_oidc.id
+  display_name   = "github-actions-pull-requests"
+
+  issuer    = "https://token.actions.githubusercontent.com"
+  subject   = "repo:EdgeOpsTech/terraform-azure-ops:pull_request"
+  audiences = ["api://AzureADTokenExchange"]
+}
+resource "azuread_application_federated_identity_credential" "github_prs-production" {
+  application_id = azuread_application.github_oidc.id
+  display_name   = "github-actions-pull-requests-production"
+
+  issuer    = "https://token.actions.githubusercontent.com"
+  subject   = "repo:EdgeOpsTech/terraform-azure-ops:pull_request:environment:production"
+  audiences = ["api://AzureADTokenExchange"]
+}
 
 data "azurerm_subscription" "current" {}
 

@@ -23,6 +23,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "rg-infra-example"
+  name     = "edgeopstech-rg-infra"
   location = "eastus"
 }
+
