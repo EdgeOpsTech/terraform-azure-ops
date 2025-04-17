@@ -28,8 +28,38 @@ variable "github_owner" {
   default     = "EdgeOpsTech"
 }
 
+# variable "github_repo" {
+#   type        = string
+#   description = "GitHub repository name (e.g. 'infra')"
+#   default     = "terraform-azure-ops"
+# }
+
 variable "github_repo" {
-  type        = string
+  type        = list(string)
   description = "GitHub repository name (e.g. 'infra')"
-  default     = "terraform-azure-ops"
+  default     = ["terraform-azure-ops", "kv-rbac-setup"]
+}
+
+variable "branches" {
+  description = "List of git branches to add as subject identifiers"
+  type        = list(string)
+  default     = ["main", "feature/*"]
+}
+
+# variable "tags" {
+#   description = "List of git tags to add as subject identifiers"
+#   type        = list(string)
+#   default     = []
+# }
+
+variable "environments" {
+  description = "List of GitHub environments to add as subject identifiers"
+  type        = list(string)
+  default     = ["production"]
+}
+
+variable "pull_request" {
+  description = "Add the 'pull request' subject identifier?"
+  type        = bool
+  default     = true
 }
