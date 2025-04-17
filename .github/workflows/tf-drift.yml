@@ -16,7 +16,7 @@ env:
   ARM_TENANT_ID: "${{ secrets.ARM_TENANT_ID }}"
   ARM_USE_OIDC: true
   ARM_SKIP_PROVIDER_REGISTRATION: true
-  WORKING_DIR: "infra" # <- match default from reusable workflow
+  WORKING_DIR: "infra"
 
 jobs:
   terraform-plan:
@@ -44,16 +44,13 @@ jobs:
       - name: Terraform Plan
         id: tf-plan
         run: |
-          export exitcode=0
-          terraform plan -detailed-exitcode -no-color -out=tfplan || export exitcode=$?
-          echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
-          if [ $exitcode -eq 1 ]; then
-            echo "Terraform Plan Failed!"
-            exit 1
-          else
-            exit 0
-          fi
+          terraform plan -detailed-exitcode -no-color -out=tfplan || echo "exitcode=$?" >> $GITHUB_OUTPUT
         working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Set Exit Code
+        id: set-exit
+        run: |
+          echo "exitcode=${{ steps.tf-plan.outputs.exitcode }}" >> $GITHUB_ENV
 
       - name: Save Terraform Plan Artifact
         uses: actions/upload-artifact@v4
@@ -83,7 +80,7 @@ jobs:
         run: echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
 
       - name: Drift Detection - Create or Update Issue
-        if: steps.tf-plan.outputs.exitcode == 2
+        if: ${{ steps.tf-plan.outputs.exitcode == '2' }}
         uses: actions/github-script@v7
         env:
           SUMMARY: "${{ steps.tf-plan-string.outputs.summary }}"
@@ -125,7 +122,7 @@ jobs:
             }
 
       - name: Drift Detection - Close Existing Issue if No Drift
-        if: steps.tf-plan.outputs.exitcode == 0
+        if: ${{ steps.tf-plan.outputs.exitcode == '0' }}
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -152,5 +149,6 @@ jobs:
             }
 
       - name: Error on Drift
-        if: steps.tf-plan.outputs.exitcode == 2
+        if: ${{ steps.tf-plan.outputs.exitcode == '2' }}
         run: exit 1
+        working-directory: ${{ env.WORKING_DIR }}
