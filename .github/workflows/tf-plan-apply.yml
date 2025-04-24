@@ -41,6 +41,8 @@ jobs:
       REPO_NAME: "${{ github.event.repository.name }}"
       REPO_OWNER: "${{ github.repository_owner }}"
       ARM_SKIP_PROVIDER_REGISTRATION: true
+      GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+      TF_VAR_github_token: ${{ secrets.GH_PAT }}
     outputs:
       tfplanExitCode: ${{ steps.tf-plan.outputs.exitcode }}
 
@@ -155,6 +157,8 @@ jobs:
       REPO_NAME: "${{ github.event.repository.name }}"
       REPO_OWNER: "${{ github.repository_owner }}"
       ARM_SKIP_PROVIDER_REGISTRATION: true
+      GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+      TF_VAR_github_token: ${{ secrets.GH_PAT }}
     environment: production
     needs: [terraform-plan]
 
