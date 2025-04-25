@@ -114,7 +114,7 @@ jobs:
       - name: Create Terraform Summary Output
         id: tf-plan-string
         run: |
-          set +e  # ← disable immediate exit on error
+          set +e  # allow script to continue on error
           PLAN_PATH=tfplan
 
           if [ ! -f "$PLAN_PATH" ]; then
@@ -124,7 +124,7 @@ jobs:
             exit 0
           fi
 
-          terraform show -no-color "$PLAN_PATH" > tf_output.txt 2>/dev/null
+          terraform show "$PLAN_PATH" > tf_output.txt 2>/dev/null
           if [ $? -ne 0 ]; then
             echo "summary<<EOF" >> $GITHUB_OUTPUT
             echo "⚠️ tfplan exists but could not be parsed." >> $GITHUB_OUTPUT
