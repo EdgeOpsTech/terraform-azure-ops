@@ -132,9 +132,9 @@ jobs:
             exit 0
           fi
 
-          CREATE_COUNT=$(grep -cE '^\+ resource' tf_output.txt || true)
-          UPDATE_COUNT=$(grep -cE '^~ resource' tf_output.txt || true)
-          DESTROY_COUNT=$(grep -cE '^- resource' tf_output.txt || true)
+          CREATE_COUNT=$(grep -cE 'will be created' tf_output.txt || true)
+          UPDATE_COUNT=$(grep -cE 'will be updated in-place|will be changed' tf_output.txt || true)
+          DESTROY_COUNT=$(grep -cE 'will be destroyed' tf_output.txt || true)
 
           delimiter="$(openssl rand -hex 8)"
           echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
