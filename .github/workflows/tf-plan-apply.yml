@@ -50,6 +50,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup GitHub access for private modules
+        run: |
+          echo -e "machine github.com\nlogin ${{ secrets.GH_PAT }}\npassword x-oauth-basic" > ~/.netrc
+
       - name: Check if working directory exists
         run: test -d "${{ env.WORKING_DIR }}" || (echo "Directory ${{ env.WORKING_DIR }} not found!" && exit 1)
 
@@ -165,6 +169,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup GitHub access for private modules
+        run: |
+          echo -e "machine github.com\nlogin ${{ secrets.GH_PAT }}\npassword x-oauth-basic" > ~/.netrc
 
       - name: Check if working directory exists
         run: test -d "${{ env.WORKING_DIR }}" || (echo "Directory ${{ env.WORKING_DIR }} not found!" && exit 1)
