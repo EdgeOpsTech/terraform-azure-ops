@@ -110,7 +110,7 @@ jobs:
           name: tfplan
           path: ${{ env.WORKING_DIR }}/tfplan
 
-      - name: Create String Output
+      - name: Create String Output #Output for Task Summary
         id: tf-plan-string
         run: |
           if [ ! -f tfplan ]; then
