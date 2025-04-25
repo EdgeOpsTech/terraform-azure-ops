@@ -189,7 +189,7 @@ jobs:
           echo "" >> $GITHUB_OUTPUT
 
           # 🟢 Create section
-          echo "<details><summary>🟢 **Create**: \`${CREATE_COUNT}\`</summary>" >> $GITHUB_OUTPUT
+          echo "<details><summary>🟢 Create: \${CREATE_COUNT}\</summary>" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           grep -E '^\s*#.*will be created' tf_output.txt || echo "No resources to create." >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
@@ -197,7 +197,7 @@ jobs:
           echo "" >> $GITHUB_OUTPUT
 
           # 🟡 Update section
-          echo "<details><summary>🟡 **Update**: \`${UPDATE_COUNT}\`</summary>" >> $GITHUB_OUTPUT
+          echo "<details><summary>🟡 Update: \${UPDATE_COUNT}\</summary>" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           grep -E '^\s*#.*will be (updated in-place|changed)' tf_output.txt || echo "No resources to update." >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
@@ -205,7 +205,7 @@ jobs:
           echo "" >> $GITHUB_OUTPUT
 
           # 🔴 Destroy section
-          echo "<details><summary>🔴 **Destroy**: \`${DESTROY_COUNT}\`</summary>" >> $GITHUB_OUTPUT
+          echo "<details><summary>🔴 Destroy: \${DESTROY_COUNT}\</summary>" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           grep -E '^\s*#.*will be destroyed' tf_output.txt || echo "No resources to destroy." >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
