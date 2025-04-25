@@ -122,6 +122,7 @@ jobs:
           fi
 
           TERRAFORM_PLAN=$(terraform show -no-color tfplan)
+
           CREATE_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '^\+ ')
           UPDATE_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '^~ ')
           DESTROY_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '^- ')
