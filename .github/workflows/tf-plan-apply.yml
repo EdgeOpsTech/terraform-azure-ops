@@ -116,7 +116,7 @@ jobs:
         id: tf-plan-string
         working-directory: ${{ env.WORKING_DIR }}
         run: |
-          PLAN_PATH="tfplan"
+          PLAN_PATH="${{ env.WORKING_DIR }}/tfplan"
           if [ ! -f "$PLAN_PATH" ]; then
             echo "⚠ Skipping summary: no tfplan file."
             echo "summary<<EOF" >> $GITHUB_OUTPUT
