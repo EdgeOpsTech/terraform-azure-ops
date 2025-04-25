@@ -114,18 +114,25 @@ jobs:
       - name: Create Summary Output
         id: tf-plan-string
         run: |
-          TERRAFORM_PLAN=$(terraform show -no-color tfplan 2>/dev/null || echo "")
+          PLAN_PATH=tfplan
 
-          if [ -z "$TERRAFORM_PLAN" ]; then
+          if [ ! -f "$PLAN_PATH" ]; then
             echo "summary<<EOF" >> $GITHUB_OUTPUT
-            echo "⚠️ tfplan file is missing or unreadable. Skipping summary." >> $GITHUB_OUTPUT
+            echo "⚠️ tfplan file is missing. Skipping summary." >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
             exit 0
           fi
 
-          CREATE_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '^\+ resource')
-          UPDATE_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '^~ resource')
-          DESTROY_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '^- resource')
+          terraform show -no-color "$PLAN_PATH" > tf_output.txt 2>/dev/null || {
+            echo "summary<<EOF" >> $GITHUB_OUTPUT
+            echo "⚠️ tfplan exists but could not be parsed." >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            exit 0
+          }
+
+          CREATE_COUNT=$(grep -cE '^\+ resource' tf_output.txt)
+          UPDATE_COUNT=$(grep -cE '^~ resource' tf_output.txt)
+          DESTROY_COUNT=$(grep -cE '^- resource' tf_output.txt)
 
           delimiter="$(openssl rand -hex 8)"
           echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
@@ -140,7 +147,7 @@ jobs:
           echo "<details><summary>Click to expand full plan</summary>" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           echo '```terraform' >> $GITHUB_OUTPUT
-          echo "$TERRAFORM_PLAN" >> $GITHUB_OUTPUT
+          cat tf_output.txt >> $GITHUB_OUTPUT
           echo '```' >> $GITHUB_OUTPUT
           echo "</details>" >> $GITHUB_OUTPUT
           echo "${delimiter}" >> $GITHUB_OUTPUT
