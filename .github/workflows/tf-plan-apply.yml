@@ -114,12 +114,14 @@ jobs:
         id: tf-plan-string
         run: |
           if [ ! -f tfplan ]; then
-            echo "Terraform plan file does not exist. Skipping summary generation."
+            echo "⚠️ Skipping summary: tfplan file not found."
+            echo "summary<<EOF" >> $GITHUB_OUTPUT
+            echo "⚠️ No tfplan file found to parse." >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
             exit 0
           fi
 
           TERRAFORM_PLAN=$(terraform show -no-color tfplan)
-
           CREATE_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '^\+ ')
           UPDATE_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '^~ ')
           DESTROY_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '^- ')
