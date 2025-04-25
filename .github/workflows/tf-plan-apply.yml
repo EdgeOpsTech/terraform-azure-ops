@@ -113,11 +113,16 @@ jobs:
       - name: Create String Output
         id: tf-plan-string
         run: |
+          if [ ! -f tfplan ]; then
+            echo "Terraform plan file does not exist. Skipping summary generation."
+            exit 0
+          fi
+
           TERRAFORM_PLAN=$(terraform show -no-color tfplan)
 
-          CREATE_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '\+ resource')
-          UPDATE_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '~ resource')
-          DESTROY_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '- resource')
+          CREATE_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '^\+ ')
+          UPDATE_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '^~ ')
+          DESTROY_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '^- ')
 
           echo "## Terraform Plan Results for \`${{ env.WORKING_DIR }}\` environment" > plan.md
           echo "" >> plan.md
