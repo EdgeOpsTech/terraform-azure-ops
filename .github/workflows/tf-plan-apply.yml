@@ -92,13 +92,18 @@ jobs:
       - name: Terraform Plan
         id: tf-plan
         run: |
-          mkdir -p "${{ env.WORKING_DIR }}"
-          terraform plan \
-            -detailed-exitcode \
-            -no-color \
-            -out "${{ env.WORKING_DIR }}/tfplan" \
-          || exit $?
+          export exitcode=0
+          terraform plan -detailed-exitcode -no-color -out tfplan \
+          || export exitcode=$?
 
+          echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
+
+          if [ "$exitcode" -eq 1 ]; then
+            echo "❌ Terraform Plan Failed!"
+            exit 1
+          fi
+
+          # 0 or 2 ⇒ success, continue
         working-directory: ${{ env.WORKING_DIR }}
 
       - name: Publish Terraform Plan
