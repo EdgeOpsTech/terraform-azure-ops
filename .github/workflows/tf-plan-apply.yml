@@ -118,9 +118,9 @@ jobs:
         run: |
           PLAN_PATH="tfplan"
           if [ ! -f "$PLAN_PATH" ]; then
-            echo "⚠️ Skipping summary: no tfplan file."
+            echo "⚠ Skipping summary: no tfplan file."
             echo "summary<<EOF" >> $GITHUB_OUTPUT
-            echo "⚠️ No tfplan found." >> $GITHUB_OUTPUT
+            echo "⚠ No tfplan file found to parse." >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
             exit 0
           fi
@@ -130,7 +130,6 @@ jobs:
           UPDATE_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '~ resource')
           DESTROY_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '- resource')
 
-          # Build the summary markdown
           cat <<EOF > plan.md
           ## Terraform Plan Results for \`${{ env.WORKING_DIR }}\` environment
 
@@ -141,10 +140,9 @@ jobs:
           - 🔴 **Destroy**: ${DESTROY_COUNT}
           EOF
 
-          # Push it to GitHub output
           echo "summary<<EOF" >> $GITHUB_OUTPUT
-          cat plan.md >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          cat plan.md       >> $GITHUB_OUTPUT
+          echo "EOF"        >> $GITHUB_OUTPUT
 
       - name: Publish Terraform Plan to Task Summary
         env:
