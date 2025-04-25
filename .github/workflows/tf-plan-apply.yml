@@ -114,16 +114,22 @@ jobs:
         id: tf-plan-string
         run: |
           TERRAFORM_PLAN=$(terraform show -no-color tfplan)
-          delimiter="$(openssl rand -hex 8)"
-          echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
-          echo "## Terraform Plan Output" >> $GITHUB_OUTPUT
-          echo "<details><summary>Click to expand</summary>" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo '```terraform' >> $GITHUB_OUTPUT
-          echo "$TERRAFORM_PLAN" >> $GITHUB_OUTPUT
-          echo '```' >> $GITHUB_OUTPUT
-          echo "</details>" >> $GITHUB_OUTPUT
-          echo "${delimiter}" >> $GITHUB_OUTPUT
+
+          CREATE_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '\+ resource')
+          UPDATE_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '~ resource')
+          DESTROY_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '- resource')
+
+          echo "## Terraform Plan Results for \`${{ env.WORKING_DIR }}\` environment" > plan.md
+          echo "" >> plan.md
+          echo "**Summary:** \`Plan: ${CREATE_COUNT} to add, ${UPDATE_COUNT} to change, ${DESTROY_COUNT} to destroy.\`" >> plan.md
+          echo "" >> plan.md
+          echo "- 🟢 **Create**: ${CREATE_COUNT}" >> plan.md
+          echo "- 🟡 **Update**: ${UPDATE_COUNT}" >> plan.md
+          echo "- 🔴 **Destroy**: ${DESTROY_COUNT}" >> plan.md
+
+          echo "summary<<EOF" >> $GITHUB_OUTPUT
+          cat plan.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
         working-directory: ${{ env.WORKING_DIR }}
 
       - name: Publish Terraform Plan to Task Summary
