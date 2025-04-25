@@ -92,10 +92,8 @@ jobs:
         id: tf-plan
         run: |
           export exitcode=0
-          terraform plan -detailed-exitcode -no-color -out tfplan || export exitcode=$?
-
+          terraform plan -detailed-exitcode -no-color -out ${{ env.WORKING_DIR }}/tfplan || export exitcode=$?
           echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
-
           if [ $exitcode -eq 1 ]; then
             echo Terraform Plan Failed!
             exit 1
@@ -110,10 +108,11 @@ jobs:
           name: tfplan
           path: ${{ env.WORKING_DIR }}/tfplan
 
-      - name: Create String Output #Output for Task Summary
+      - name: Create String Output
         id: tf-plan-string
         run: |
-          if [ ! -f tfplan ]; then
+          PLAN_PATH="${{ env.WORKING_DIR }}/tfplan"
+          if [ ! -f "$PLAN_PATH" ]; then
             echo "⚠️ Skipping summary: tfplan file not found."
             echo "summary<<EOF" >> $GITHUB_OUTPUT
             echo "⚠️ No tfplan file found to parse." >> $GITHUB_OUTPUT
@@ -121,7 +120,7 @@ jobs:
             exit 0
           fi
 
-          TERRAFORM_PLAN=$(terraform show -no-color tfplan)
+          TERRAFORM_PLAN=$(terraform show -no-color "$PLAN_PATH")
 
           CREATE_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '^\+ ')
           UPDATE_COUNT=$(echo "$TERRAFORM_PLAN" | grep -cE '^~ ')
