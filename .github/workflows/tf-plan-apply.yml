@@ -111,64 +111,20 @@ jobs:
           name: tfplan
           path: ${{ env.WORKING_DIR }}/tfplan
 
-      # - name: Create Terraform Summary Output
-      #   id: tf-plan-string
-      #   run: |
-      #     set +e  # allow script to continue on error
-      #     PLAN_PATH=tfplan
-
-      #     if [ ! -f "$PLAN_PATH" ]; then
-      #       echo "summary<<EOF" >> $GITHUB_OUTPUT
-      #       echo "⚠️ tfplan file is missing. Skipping summary." >> $GITHUB_OUTPUT
-      #       echo "EOF" >> $GITHUB_OUTPUT
-      #       exit 0
-      #     fi
-
-      #     terraform show -no-color "$PLAN_PATH" > tf_output.txt 2>/dev/null
-      #     if [ $? -ne 0 ]; then
-      #       echo "summary<<EOF" >> $GITHUB_OUTPUT
-      #       echo "⚠️ tfplan exists but could not be parsed." >> $GITHUB_OUTPUT
-      #       echo "EOF" >> $GITHUB_OUTPUT
-      #       exit 0
-      #     fi
-
-      #     CREATE_COUNT=$(grep -cE 'will be created' tf_output.txt || true)
-      #     UPDATE_COUNT=$(grep -cE 'will be updated in-place|will be changed' tf_output.txt || true)
-      #     DESTROY_COUNT=$(grep -cE 'will be destroyed' tf_output.txt || true)
-
-      #     delimiter="$(openssl rand -hex 8)"
-      #     echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
-      #     echo "## Terraform Plan Output" >> $GITHUB_OUTPUT
-      #     echo "" >> $GITHUB_OUTPUT
-      #     echo "**Summary:** \`Plan: ${CREATE_COUNT} to add, ${UPDATE_COUNT} to change, ${DESTROY_COUNT} to destroy.\`" >> $GITHUB_OUTPUT
-      #     echo "" >> $GITHUB_OUTPUT
-      #     echo "- 🟢 **Create**: ${CREATE_COUNT}" >> $GITHUB_OUTPUT
-      #     echo "- 🟡 **Update**: ${UPDATE_COUNT}" >> $GITHUB_OUTPUT
-      #     echo "- 🔴 **Destroy**: ${DESTROY_COUNT}" >> $GITHUB_OUTPUT
-      #     echo "" >> $GITHUB_OUTPUT
-      #     echo "<details><summary>Click to expand full plan</summary>" >> $GITHUB_OUTPUT
-      #     echo "" >> $GITHUB_OUTPUT
-      #     echo '```terraform' >> $GITHUB_OUTPUT
-      #     cat tf_output.txt >> $GITHUB_OUTPUT
-      #     echo '```' >> $GITHUB_OUTPUT
-      #     echo "</details>" >> $GITHUB_OUTPUT
-      #     echo "${delimiter}" >> $GITHUB_OUTPUT
-      #   working-directory: ${{ env.WORKING_DIR }}
-
       - name: Create Terraform Summary Output
         id: tf-plan-string
         run: |
-          set +e
+          set +e  # allow script to continue on error
           PLAN_PATH=tfplan
 
-          if [ ! -f "${PLAN_PATH}" ]; then
+          if [ ! -f "$PLAN_PATH" ]; then
             echo "summary<<EOF" >> $GITHUB_OUTPUT
             echo "⚠️ tfplan file is missing. Skipping summary." >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
             exit 0
           fi
 
-          terraform show -no-color "${PLAN_PATH}" > tf_output.txt 2>/dev/null
+          terraform show -no-color "$PLAN_PATH" > tf_output.txt 2>/dev/null
           if [ $? -ne 0 ]; then
             echo "summary<<EOF" >> $GITHUB_OUTPUT
             echo "⚠️ tfplan exists but could not be parsed." >> $GITHUB_OUTPUT
@@ -176,53 +132,91 @@ jobs:
             exit 0
           fi
 
-          CREATE_COUNT=$(grep -cE '^\s*#.*will be created' tf_output.txt || true)
-          UPDATE_COUNT=$(grep -cE '^\s*#.*will be (updated in-place|changed)' tf_output.txt || true)
-          DESTROY_COUNT=$(grep -cE '^\s*#.*will be destroyed' tf_output.txt || true)
+          CREATE_COUNT=$(grep -cE 'will be created' tf_output.txt || true)
+          UPDATE_COUNT=$(grep -cE 'will be updated in-place|will be changed' tf_output.txt || true)
+          DESTROY_COUNT=$(grep -cE 'will be destroyed' tf_output.txt || true)
 
-          delimiter=$(openssl rand -hex 8)
+          delimiter="$(openssl rand -hex 8)"
           echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
-
-          # Color-coded summary header
-          echo "<h2>Terraform Plan Output</h2>" >> $GITHUB_OUTPUT
-          echo "<strong>Summary:</strong> " >> $GITHUB_OUTPUT
-          echo "<span style='color: #2ECC40;'>🟢 ${CREATE_COUNT} to add</span>, " >> $GITHUB_OUTPUT
-          echo "<span style='color: #FFDC00;'>🟡 ${UPDATE_COUNT} to change</span>, " >> $GITHUB_OUTPUT
-          echo "<span style='color: #FF4136;'>🔴 ${DESTROY_COUNT} to destroy</span><br><br>" >> $GITHUB_OUTPUT
-
-          # Color-coded details sections
-          echo "<details open><summary>🟢 <strong>Create</strong>: ${CREATE_COUNT}</summary>" >> $GITHUB_OUTPUT
-          echo '<pre style="color: #2ECC40;">' >> $GITHUB_OUTPUT
-          grep -E '^\s*#.*will be created' tf_output.txt | sed 's/^/🟢 /' || echo "No resources to create." >> $GITHUB_OUTPUT
-          echo '</pre></details><br>' >> $GITHUB_OUTPUT
-
-          echo "<details><summary>🟡 <strong>Update</strong>: ${UPDATE_COUNT}</summary>" >> $GITHUB_OUTPUT
-          echo '<pre style="color: #FFDC00;">' >> $GITHUB_OUTPUT
-          grep -E '^\s*#.*will be (updated in-place|changed)' tf_output.txt | sed 's/^/🟡 /' || echo "No resources to update." >> $GITHUB_OUTPUT
-          echo '</pre></details><br>' >> $GITHUB_OUTPUT
-
-          echo "<details><summary>🔴 <strong>Destroy</strong>: ${DESTROY_COUNT}</summary>" >> $GITHUB_OUTPUT
-          echo '<pre style="color: #FF4136;">' >> $GITHUB_OUTPUT
-          grep -E '^\s*#.*will be destroyed' tf_output.txt | sed 's/^/🔴 /' || echo "No resources to destroy." >> $GITHUB_OUTPUT
-          echo '</pre></details><br>' >> $GITHUB_OUTPUT
-
-          # Full plan with ANSI color codes
-          echo "<details><summary>📜 <strong>Full Terraform Plan</strong></summary>" >> $GITHUB_OUTPUT
-          echo '<pre>' >> $GITHUB_OUTPUT
-          sed -e 's/\(#.*will be created\)/\x1b[32m\1\x1b[0m/' \
-              -e 's/\(#.*will be updated in-place\)/\x1b[33m\1\x1b[0m/' \
-              -e 's/\(#.*will be destroyed\)/\x1b[31m\1\x1b[0m/' \
-              tf_output.txt >> $GITHUB_OUTPUT
-          echo '</pre></details>' >> $GITHUB_OUTPUT
-
+          echo "## Terraform Plan Output" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "**Summary:** \`Plan: ${CREATE_COUNT} to add, ${UPDATE_COUNT} to change, ${DESTROY_COUNT} to destroy.\`" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "- 🟢 **Create**: ${CREATE_COUNT}" >> $GITHUB_OUTPUT
+          echo "- 🟡 **Update**: ${UPDATE_COUNT}" >> $GITHUB_OUTPUT
+          echo "- 🔴 **Destroy**: ${DESTROY_COUNT}" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "<details><summary>Click to expand full plan</summary>" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo '```terraform' >> $GITHUB_OUTPUT
+          cat tf_output.txt >> $GITHUB_OUTPUT
+          echo '```' >> $GITHUB_OUTPUT
+          echo "</details>" >> $GITHUB_OUTPUT
           echo "${delimiter}" >> $GITHUB_OUTPUT
         working-directory: ${{ env.WORKING_DIR }}
 
-      - name: Publish Terraform Plan to Task Summary
-        env:
-          SUMMARY: ${{ steps.tf-plan-string.outputs.summary }}
-        run: |
-          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+      # - name: Create Terraform Summary Output
+      #   id: tf-plan-string
+      #   run: |
+      #     set +e
+      #     PLAN_PATH=tfplan
+
+      #     if [ ! -f "${PLAN_PATH}" ]; then
+      #       echo "summary<<EOF" >> $GITHUB_OUTPUT
+      #       echo "⚠️ tfplan file is missing. Skipping summary." >> $GITHUB_OUTPUT
+      #       echo "EOF" >> $GITHUB_OUTPUT
+      #       exit 0
+      #     fi
+
+      #     terraform show -no-color "${PLAN_PATH}" > tf_output.txt 2>/dev/null
+      #     if [ $? -ne 0 ]; then
+      #       echo "summary<<EOF" >> $GITHUB_OUTPUT
+      #       echo "⚠️ tfplan exists but could not be parsed." >> $GITHUB_OUTPUT
+      #       echo "EOF" >> $GITHUB_OUTPUT
+      #       exit 0
+      #     fi
+
+      #     CREATE_COUNT=$(grep -cE '^\s*#.*will be created' tf_output.txt || true)
+      #     UPDATE_COUNT=$(grep -cE '^\s*#.*will be (updated in-place|changed)' tf_output.txt || true)
+      #     DESTROY_COUNT=$(grep -cE '^\s*#.*will be destroyed' tf_output.txt || true)
+
+      #     delimiter=$(openssl rand -hex 8)
+      #     echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
+
+      #     # Color-coded summary header
+      #     echo "<h2>Terraform Plan Output</h2>" >> $GITHUB_OUTPUT
+      #     echo "<strong>Summary:</strong> " >> $GITHUB_OUTPUT
+      #     echo "<span style='color: #2ECC40;'>🟢 ${CREATE_COUNT} to add</span>, " >> $GITHUB_OUTPUT
+      #     echo "<span style='color: #FFDC00;'>🟡 ${UPDATE_COUNT} to change</span>, " >> $GITHUB_OUTPUT
+      #     echo "<span style='color: #FF4136;'>🔴 ${DESTROY_COUNT} to destroy</span><br><br>" >> $GITHUB_OUTPUT
+
+      #     # Color-coded details sections
+      #     echo "<details open><summary>🟢 <strong>Create</strong>: ${CREATE_COUNT}</summary>" >> $GITHUB_OUTPUT
+      #     echo '<pre style="color: #2ECC40;">' >> $GITHUB_OUTPUT
+      #     grep -E '^\s*#.*will be created' tf_output.txt | sed 's/^/🟢 /' || echo "No resources to create." >> $GITHUB_OUTPUT
+      #     echo '</pre></details><br>' >> $GITHUB_OUTPUT
+
+      #     echo "<details><summary>🟡 <strong>Update</strong>: ${UPDATE_COUNT}</summary>" >> $GITHUB_OUTPUT
+      #     echo '<pre style="color: #FFDC00;">' >> $GITHUB_OUTPUT
+      #     grep -E '^\s*#.*will be (updated in-place|changed)' tf_output.txt | sed 's/^/🟡 /' || echo "No resources to update." >> $GITHUB_OUTPUT
+      #     echo '</pre></details><br>' >> $GITHUB_OUTPUT
+
+      #     echo "<details><summary>🔴 <strong>Destroy</strong>: ${DESTROY_COUNT}</summary>" >> $GITHUB_OUTPUT
+      #     echo '<pre style="color: #FF4136;">' >> $GITHUB_OUTPUT
+      #     grep -E '^\s*#.*will be destroyed' tf_output.txt | sed 's/^/🔴 /' || echo "No resources to destroy." >> $GITHUB_OUTPUT
+      #     echo '</pre></details><br>' >> $GITHUB_OUTPUT
+
+      #     # Full plan with ANSI color codes
+      #     echo "<details><summary>📜 <strong>Full Terraform Plan</strong></summary>" >> $GITHUB_OUTPUT
+      #     echo '<pre>' >> $GITHUB_OUTPUT
+      #     sed -e 's/\(#.*will be created\)/\x1b[32m\1\x1b[0m/' \
+      #         -e 's/\(#.*will be updated in-place\)/\x1b[33m\1\x1b[0m/' \
+      #         -e 's/\(#.*will be destroyed\)/\x1b[31m\1\x1b[0m/' \
+      #         tf_output.txt >> $GITHUB_OUTPUT
+      #     echo '</pre></details>' >> $GITHUB_OUTPUT
+
+      #     echo "${delimiter}" >> $GITHUB_OUTPUT
+      #   working-directory: ${{ env.WORKING_DIR }}
 
       - name: Push Terraform Output to PR
         if: github.ref != 'refs/heads/main'
