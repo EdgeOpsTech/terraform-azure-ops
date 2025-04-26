@@ -183,42 +183,28 @@ jobs:
           delimiter="$(openssl rand -hex 8)"
           echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
 
-          echo "## Terraform Plan Output" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "**Summary:** \`Plan: ${CREATE_COUNT} to add, ${UPDATE_COUNT} to change, ${DESTROY_COUNT} to destroy.\`" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
+          echo "<h2>Terraform Plan Output</h2>" >> $GITHUB_OUTPUT
+          echo "<strong>Summary:</strong> <code>Plan: ${CREATE_COUNT} to add, ${UPDATE_COUNT} to change, ${DESTROY_COUNT} to destroy.</code><br><br>" >> $GITHUB_OUTPUT
 
-          # 🟢 Create section
-          echo "<details><summary>🟢 Create: ${CREATE_COUNT}</summary>" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
+          echo "<details open><summary>🟢 <strong>Create</strong>: ${CREATE_COUNT}</summary>" >> $GITHUB_OUTPUT
+          echo '<pre>' >> $GITHUB_OUTPUT
           grep -E '^\s*#.*will be created' tf_output.txt || echo "No resources to create." >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "</details>" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
+          echo '</pre></details><br>' >> $GITHUB_OUTPUT
 
-          # 🟡 Update section
-          echo "<details><summary>🟡 Update: ${UPDATE_COUNT}</summary>" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
+          echo "<details><summary>🟡 <strong>Update</strong>: ${UPDATE_COUNT}</summary>" >> $GITHUB_OUTPUT
+          echo '<pre>' >> $GITHUB_OUTPUT
           grep -E '^\s*#.*will be (updated in-place|changed)' tf_output.txt || echo "No resources to update." >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "</details>" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
+          echo '</pre></details><br>' >> $GITHUB_OUTPUT
 
-          # 🔴 Destroy section
-          echo "<details><summary>🔴 Destroy: ${DESTROY_COUNT}</summary>" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
+          echo "<details><summary>🔴 <strong>Destroy</strong>: ${DESTROY_COUNT}</summary>" >> $GITHUB_OUTPUT
+          echo '<pre>' >> $GITHUB_OUTPUT
           grep -E '^\s*#.*will be destroyed' tf_output.txt || echo "No resources to destroy." >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "</details>" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
+          echo '</pre></details><br>' >> $GITHUB_OUTPUT
 
-          # Full Plan
-          echo "<details><summary>📜 Full Terraform Plan</summary>" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo '```diff' >> $GITHUB_OUTPUT
+          echo "<details><summary>📜 <strong>Full Terraform Plan</strong></summary>" >> $GITHUB_OUTPUT
+          echo '<pre>' >> $GITHUB_OUTPUT
           cat tf_output.txt >> $GITHUB_OUTPUT
-          echo '```' >> $GITHUB_OUTPUT
-          echo "</details>" >> $GITHUB_OUTPUT
+          echo '</pre></details>' >> $GITHUB_OUTPUT
 
           echo "${delimiter}" >> $GITHUB_OUTPUT
         working-directory: ${{ env.WORKING_DIR }}
