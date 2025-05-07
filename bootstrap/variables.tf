@@ -37,7 +37,7 @@ variable "github_owner" {
 variable "github_repo" {
   type        = list(string)
   description = "GitHub repository name (e.g. 'infra')"
-  default     = ["terraform-azure-ops", "kv-rbac-setup", "super-webapp"]
+  default     = ["terraform-azure-ops", "kv-rbac-setup", "super-webapp", "azure-vm-setup"]
 }
 
 variable "branches" {
