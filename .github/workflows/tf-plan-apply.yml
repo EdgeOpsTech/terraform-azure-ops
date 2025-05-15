@@ -248,7 +248,7 @@ jobs:
       ARM_SKIP_PROVIDER_REGISTRATION: true
       GITHUB_TOKEN: ${{ secrets.GH_PAT }}
       TF_VAR_github_token: ${{ secrets.GH_PAT }}
-    environment: production
+    environment: dev
     needs: [terraform-plan]
 
     steps:

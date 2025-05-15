@@ -213,7 +213,6 @@ resource "azurerm_role_assignment" "rbac_assigner" {
   principal_id         = azuread_service_principal.github_oidc.id
 }
 
-
 output "arm_client_id" {
   description = "Set this as the GitHub secret ARM_CLIENT_ID"
   value       = azuread_application.github_oidc.client_id
