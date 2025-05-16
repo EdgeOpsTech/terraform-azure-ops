@@ -52,6 +52,12 @@ resource "azurerm_storage_container" "tfstate" {
   container_access_type = "private"
 }
 
+resource "azurerm_storage_container" "tfstate_main" {
+  name                  = "tf-state-submgmt-np-main"
+  storage_account_name  = azurerm_storage_account.tfstate.name
+  container_access_type = "private"
+}
+
 
 data "azuread_client_config" "current" {}
 
@@ -213,7 +219,6 @@ resource "azurerm_role_assignment" "rbac_assigner" {
   principal_id         = azuread_service_principal.github_oidc.id
 }
 
-
 output "arm_client_id" {
   description = "Set this as the GitHub secret ARM_CLIENT_ID"
   value       = azuread_application.github_oidc.client_id
@@ -228,14 +233,17 @@ output "arm_tenant_id" {
 }
 
 output "backend_config" {
-  value = <<EOT
+  value = join("\n\n", [
+    for repo in var.github_repo : <<EOT
 resource_group_name  = "${azurerm_resource_group.tfstate.name}"
 storage_account_name = "${azurerm_storage_account.tfstate.name}"
-container_name       = "${azurerm_storage_container.tfstate[var.github_repo[0]].name}"
+container_name       = "${azurerm_storage_container.tfstate[repo].name}"
+# key                  = "terraform-${repo}.tfstate"
 key                  = "terraform.tfstate"
 
 use_oidc  = true
 client_id = "${azuread_application.github_oidc.client_id}"
 EOT
+  ])
 }
 
