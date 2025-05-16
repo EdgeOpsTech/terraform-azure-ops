@@ -37,7 +37,7 @@ variable "github_owner" {
 variable "github_repo" {
   type        = list(string)
   description = "GitHub repository name (e.g. 'infra')"
-  default     = ["terraform-azure-ops", "kv-rbac-setup", "super-webapp", "azure-vm-setup"]
+  default     = ["terraform-azure-ops", "kv-rbac-setup", "super-webapp", "azure-vm-setup", "edgeops-sub-mgmt"]
 }
 
 variable "branches" {
@@ -55,7 +55,7 @@ variable "branches" {
 variable "environments" {
   description = "List of GitHub environments to add as subject identifiers"
   type        = list(string)
-  default     = ["production"]
+  default     = ["dev"]
 }
 
 variable "pull_request" {

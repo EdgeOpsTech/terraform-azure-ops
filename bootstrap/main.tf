@@ -52,6 +52,12 @@ resource "azurerm_storage_container" "tfstate" {
   container_access_type = "private"
 }
 
+resource "azurerm_storage_container" "tfstate_main" {
+  name                  = "tf-state-submgmt-np-main"
+  storage_account_name  = azurerm_storage_account.tfstate.name
+  container_access_type = "private"
+}
+
 
 data "azuread_client_config" "current" {}
 

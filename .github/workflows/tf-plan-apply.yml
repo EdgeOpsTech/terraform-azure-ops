@@ -66,6 +66,10 @@ jobs:
         run: terraform init
         working-directory: ${{ env.WORKING_DIR }}
 
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ${{ env.WORKING_DIR }}
+
       - name: Terraform Format
         run: terraform fmt -check
         working-directory: ${{ env.WORKING_DIR }}
@@ -267,6 +271,14 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Terraform Format
+        run: terraform fmt -check
         working-directory: ${{ env.WORKING_DIR }}
 
       - name: Download Terraform Plan
