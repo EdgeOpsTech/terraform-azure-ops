@@ -50,6 +50,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Inject source‑repo tag for Terraform
+        run: |
+          echo "{\"source_repo\":\"${GITHUB_REPOSITORY}\"}" \
+            > source_tags.auto.tfvars.json
+        working-directory: ${{ env.WORKING_DIR }}
+
       - name: Setup GitHub access for private modules
         run: |
           echo -e "machine github.com\nlogin ${{ secrets.GH_PAT }}\npassword x-oauth-basic" > ~/.netrc
@@ -258,6 +264,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Inject source‑repo tag for Terraform
+        run: |
+          echo "{\"source_repo\":\"${GITHUB_REPOSITORY}\"}" \
+            > source_tags.auto.tfvars.json
+        working-directory: ${{ env.WORKING_DIR }}
 
       - name: Setup GitHub access for private modules
         run: |
