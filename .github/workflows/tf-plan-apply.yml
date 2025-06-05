@@ -267,7 +267,7 @@ jobs:
 
       - name: Inject source‑repo tag for Terraform
         run: |
-          echo "{\"source-repo\":\"${GITHUB_REPOSITORY}\"}" \
+          echo "{\"source_repo\":\"${GITHUB_REPOSITORY}\"}" \
             > source_tags.auto.tfvars.json
         working-directory: ${{ env.WORKING_DIR }}
 
