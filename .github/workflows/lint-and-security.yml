@@ -30,7 +30,7 @@ jobs:
 
       - name: Install tfsec
         run: |
-          TFS_VERSION=$(curl -s https://api.github.com/repos/aquasecurity/tfsec/releases/latest | grep tag_name | cut -d '\"' -f4)
+          TFS_VERSION=$(curl -s https://api.github.com/repos/aquasecurity/tfsec/releases/latest | jq -r .tag_name)
           curl -L -o tfsec https://github.com/aquasecurity/tfsec/releases/download/${TFS_VERSION}/tfsec-linux-amd64
           chmod +x tfsec
           sudo mv tfsec /usr/local/bin/
