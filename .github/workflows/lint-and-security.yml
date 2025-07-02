@@ -35,5 +35,20 @@ jobs:
           chmod +x tfsec
           sudo mv tfsec /usr/local/bin/
 
-      - name: Run tfsec
-        run: tfsec .
+      - name: Install checkov
+        run: |
+          pip install --upgrade pip
+          pip install checkov
+
+      - name: Run checkov
+        run: checkov -d .
+
+      - name: Run tfsec with SARIF output
+        run: |
+          tfsec . --format sarif --out tfsec-results.sarif
+
+      - name: Upload tfsec SARIF results
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: tfsec-results.sarif
