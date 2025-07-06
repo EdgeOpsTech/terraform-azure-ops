@@ -302,3 +302,16 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
         working-directory: ${{ env.WORKING_DIR }}
+
+  notify-slack:
+    name: Notify Slack on Failure
+    needs: [terraform-plan, terraform-apply]
+    if: ${{ failure() }}
+    uses: EdgeOpsTech/edgeops-slack/.github/workflows/notify-slack.yml@main
+    with:
+      job_name: "Terraform Plan/Apply"
+      run_id: ${{ github.run_id }}
+      channel: "ci-cd-alerts"
+      error_message: "Terraform Plan or Apply failed in ${{ github.repository }}"
+    secrets:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
