@@ -22,6 +22,8 @@ on:
         required: true
       GH_PAT:
         required: true # renamed from GITHUB_TOKEN to avoid conflict
+      SLACK_BOT_TOKEN:
+        required: true
 
 permissions:
   id-token: write
