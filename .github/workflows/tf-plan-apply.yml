@@ -306,7 +306,7 @@ jobs:
   notify-slack:
     name: Notify Slack on Failure
     needs: [terraform-plan]
-    if: ${{ failure() }}
+    if: ${{ failure() }} # ✅ Ensure it only runs if above job fails
     uses: EdgeOpsTech/edgeops-slack/.github/workflows/notify-slack.yml@main
     with:
       job_name: "Terraform Plan/Apply"
