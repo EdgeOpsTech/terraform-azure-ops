@@ -305,7 +305,7 @@ jobs:
 
   notify-slack:
     name: Notify Slack on Failure
-    needs: [terraform-plan, terraform-apply]
+    needs: [terraform-plan]
     if: ${{ failure() }}
     uses: EdgeOpsTech/edgeops-slack/.github/workflows/notify-slack.yml@main
     with:
