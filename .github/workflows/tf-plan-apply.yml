@@ -22,6 +22,8 @@ on:
         required: true
       GH_PAT:
         required: true # renamed from GITHUB_TOKEN to avoid conflict
+      SLACK_BOT_TOKEN:
+        required: true
 
 permissions:
   id-token: write
@@ -49,6 +51,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Inject source‑repo tag for Terraform
+        run: |
+          echo "{\"source_repo\":\"${GITHUB_REPOSITORY}\"}" \
+            > source_tags.auto.tfvars.json
+        working-directory: ${{ env.WORKING_DIR }}
 
       - name: Setup GitHub access for private modules
         run: |
@@ -259,6 +267,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Inject source‑repo tag for Terraform
+        run: |
+          echo "{\"source_repo\":\"${GITHUB_REPOSITORY}\"}" \
+            > source_tags.auto.tfvars.json
+        working-directory: ${{ env.WORKING_DIR }}
+
       - name: Setup GitHub access for private modules
         run: |
           echo -e "machine github.com\nlogin ${{ secrets.GH_PAT }}\npassword x-oauth-basic" > ~/.netrc
@@ -290,3 +304,16 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
         working-directory: ${{ env.WORKING_DIR }}
+
+  notify-slack:
+    name: Notify Slack on Terraform PlanFailure
+    needs: [terraform-plan]
+    if: ${{ failure() }} # ✅ Ensure it only runs if above job fails
+    uses: EdgeOpsTech/edgeops-slack/.github/workflows/notify-slack.yml@main
+    with:
+      job_name: "Terraform Plan/Apply"
+      run_id: ${{ github.run_id }}
+      channel: "ci-cd-alerts"
+      error_message: "Terraform Plan failed in ${{ github.repository }}"
+    secrets:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
