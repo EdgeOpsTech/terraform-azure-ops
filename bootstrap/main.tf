@@ -219,6 +219,12 @@ resource "azurerm_role_assignment" "rbac_assigner" {
   principal_id         = azuread_service_principal.github_oidc.id
 }
 
+resource "azurerm_role_assignment" "custom_storage_blob_data_contributor" {
+  scope                = azurerm_storage_account.tfstate.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = "78b776c8-c1c5-4f5b-b46e-4dcd278720b5"
+}
+
 output "arm_client_id" {
   description = "Set this as the GitHub secret ARM_CLIENT_ID"
   value       = azuread_application.github_oidc.client_id
