@@ -307,7 +307,7 @@ jobs:
 
   notify-slack-plan-failure:
     name: Notify Slack on Terraform PlanFailure
-    needs: [terraform-plan]
+    needs: [terraform-plan, terraform-apply]
     if: ${{ failure() }} # ✅ Ensure it only runs if above job fails
     uses: EdgeOpsTech/edgeops-slack/.github/workflows/notify-slack.yml@main
     with:
@@ -318,15 +318,15 @@ jobs:
     secrets:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
-  notify-slack-apply-failure:
-    name: Notify Slack on Terraform PlanFailure
-    needs: [terraform-apply]
-    if: ${{ failure() }} # ✅ Ensure it only runs if above job fails
-    uses: EdgeOpsTech/edgeops-slack/.github/workflows/notify-slack.yml@main
-    with:
-      job_name: "Terraform Plan/Apply"
-      run_id: ${{ github.run_id }}
-      channel: "ci-cd-alerts"
-      error_message: "Terraform Plan failed in ${{ github.repository }}"
-    secrets:
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+  # notify-slack-apply-failure:
+  #   name: Notify Slack on Terraform PlanFailure
+  #   needs: [terraform-apply]
+  #   if: ${{ failure() }} # ✅ Ensure it only runs if above job fails
+  #   uses: EdgeOpsTech/edgeops-slack/.github/workflows/notify-slack.yml@main
+  #   with:
+  #     job_name: "Terraform Plan/Apply"
+  #     run_id: ${{ github.run_id }}
+  #     channel: "ci-cd-alerts"
+  #     error_message: "Terraform Plan failed in ${{ github.repository }}"
+  #   secrets:
+  #     SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
