@@ -1,0 +1,23 @@
+name: "Call Terraform Plan/Apply - Bootstrap"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    # Reusable workflow exists at .github/workflows/tf-plan-apply.yml
+    uses: ./.github/workflows/tf-plan-apply.yml
+    with:
+      working_dir: "./bootstrap"
+    secrets:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      GH_PAT: ${{ secrets.GH_PAT }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}

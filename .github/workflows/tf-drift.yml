@@ -16,12 +16,14 @@ env:
   ARM_TENANT_ID: "${{ secrets.ARM_TENANT_ID }}"
   ARM_USE_OIDC: true
   ARM_SKIP_PROVIDER_REGISTRATION: true
-  WORKING_DIR: "infra"
 
 jobs:
   terraform-plan:
-    name: "Terraform Plan (Drift Detection)"
+    name: "Terraform Plan (Drift Detection) - ${{ matrix.working_dir }}"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        working_dir: [infra, bootstrap]
     outputs:
       tfplanExitCode: ${{ steps.tf-plan.outputs.exitcode }}
 
@@ -30,7 +32,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check if working directory exists
-        run: test -d "${{ env.WORKING_DIR }}" || (echo "Directory ${{ env.WORKING_DIR }} not found!" && exit 1)
+        run: test -d "${{ matrix.working_dir }}" || (echo "Directory ${{ matrix.working_dir }} not found!" && exit 1)
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -39,13 +41,13 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: ${{ env.WORKING_DIR }}
+        working-directory: ${{ matrix.working_dir }}
 
       - name: Terraform Plan
         id: tf-plan
         run: |
           terraform plan -detailed-exitcode -no-color -out=tfplan || echo "exitcode=$?" >> $GITHUB_OUTPUT
-        working-directory: ${{ env.WORKING_DIR }}
+        working-directory: ${{ matrix.working_dir }}
 
       - name: Set Exit Code
         id: set-exit
@@ -53,10 +55,10 @@ jobs:
           echo "exitcode=${{ steps.tf-plan.outputs.exitcode }}" >> $GITHUB_ENV
 
       - name: Save Terraform Plan Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: tfplan
-          path: ${{ env.WORKING_DIR }}/tfplan
+          name: tfplan-${{ matrix.working_dir }}
+          path: ${{ matrix.working_dir }}/tfplan
 
       - name: Create String Output
         id: tf-plan-string
@@ -64,7 +66,7 @@ jobs:
           TERRAFORM_PLAN=$(terraform show -no-color tfplan)
           delimiter="$(openssl rand -hex 8)"
           echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
-          echo "## Terraform Plan Output" >> $GITHUB_OUTPUT
+          echo "## Terraform Plan Output - ${{ matrix.working_dir }}" >> $GITHUB_OUTPUT
           echo "<details><summary>Click to expand</summary>" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           echo '```terraform' >> $GITHUB_OUTPUT
@@ -72,7 +74,7 @@ jobs:
           echo '```' >> $GITHUB_OUTPUT
           echo "</details>" >> $GITHUB_OUTPUT
           echo "${delimiter}" >> $GITHUB_OUTPUT
-        working-directory: ${{ env.WORKING_DIR }}
+        working-directory: ${{ matrix.working_dir }}
 
       - name: Publish Terraform Plan to Task Summary
         env:
@@ -87,7 +89,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const title = 'Terraform Configuration Drift Detected';
+            const title = 'Terraform Configuration Drift Detected - ${{ matrix.working_dir }}';
             const body = `${process.env.SUMMARY}`;
             const creator = 'github-actions[bot]';
             const issues = await github.rest.issues.listForRepo({
@@ -127,7 +129,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const title = 'Terraform Configuration Drift Detected';
+            const title = 'Terraform Configuration Drift Detected - ${{ matrix.working_dir }}';
             const creator = 'github-actions[bot]';
             const issues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
@@ -151,4 +153,4 @@ jobs:
       - name: Error on Drift
         if: ${{ steps.tf-plan.outputs.exitcode == '2' }}
         run: exit 1
-        working-directory: ${{ env.WORKING_DIR }}
+        working-directory: ${{ matrix.working_dir }}
