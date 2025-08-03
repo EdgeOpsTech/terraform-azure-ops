@@ -16,12 +16,15 @@ permissions:
 
 jobs:
   terraform-unit-tests:
-    name: "Terraform Unit Tests"
+    name: "Terraform Unit Tests - ${{ matrix.working_dir }}"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        working_dir: [infra, bootstrap]
 
     defaults:
       run:
-        working-directory: infra
+        working-directory: ${{ matrix.working_dir }}
 
     steps:
       - name: Checkout repository
@@ -49,7 +52,7 @@ jobs:
         id: checkov
         uses: bridgecrewio/checkov-action@master
         with:
-          directory: infra
+          directory: ${{ matrix.working_dir }}
           framework: terraform
           output_format: sarif
 
@@ -58,4 +61,4 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif
-          category: checkov
+          category: checkov-${{ matrix.working_dir }}

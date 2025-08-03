@@ -1,22 +1,3 @@
-terraform {
-  required_version = ">= 1.6"
-
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.117"
-    }
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = "~> 2.50"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.6"
-    }
-  }
-}
-
 provider "azurerm" {
   features {}
   tenant_id       = var.tenant_id
@@ -217,12 +198,6 @@ resource "azurerm_role_assignment" "rbac_assigner" {
   scope                = data.azurerm_subscription.current.id
   role_definition_name = "User Access Administrator"
   principal_id         = azuread_service_principal.github_oidc.id
-}
-
-resource "azurerm_role_assignment" "custom_storage_blob_data_contributor" {
-  scope                = azurerm_storage_account.tfstate.id
-  role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = "78b776c8-c1c5-4f5b-b46e-4dcd278720b5"
 }
 
 output "arm_client_id" {
