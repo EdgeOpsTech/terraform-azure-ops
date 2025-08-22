@@ -51,7 +51,7 @@ variable "github_owner" {
 variable "github_repo" {
   type        = list(string)
   description = "GitHub repository name (e.g. 'infra')"
-  default     = ["terraform-azure-ops", "kv-rbac-setup", "super-webapp", "azure-vm-setup", "edgeops-sub-mgmt"]
+  default     = ["terraform-azure-ops", "kv-rbac-setup", "super-webapp", "azure-vm-setup", "edgeops-sub-mgmt", "edgeops-keyvault-module"]
   validation {
     condition     = length(var.github_repo) > 0
     error_message = "At least one GitHub repository must be specified."
