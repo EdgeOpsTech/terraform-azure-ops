@@ -74,7 +74,7 @@ variable "github_repo" {
 variable "branches" {
   description = "List of GitHub branches for federated credentials"
   type        = list(string)
-  default     = ["main", "dev", "release/*"]
+  default     = ["main", "dev", "feature/*", "release/*"]
 }
 
 variable "environments" {

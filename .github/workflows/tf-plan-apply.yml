@@ -22,8 +22,14 @@ on:
         type: string
         default: ""
     secrets:
-      ARM_CLIENT_ID:
-        required: true
+      ARM_CLIENT_ID_DEV:
+        required: false
+      ARM_CLIENT_ID_NONPROD:
+        required: false
+      ARM_CLIENT_ID_PROD:
+        required: false
+      ARM_CLIENT_ID: # legacy fallback
+        required: false
       ARM_SUBSCRIPTION_ID:
         required: true
       ARM_TENANT_ID:
@@ -42,9 +48,10 @@ jobs:
   terraform-plan:
     name: "Terraform Plan"
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     env:
       WORKING_DIR: ${{ inputs.working_dir != '' && inputs.working_dir || 'infra' }}
-      ARM_CLIENT_ID: "${{ secrets.ARM_CLIENT_ID }}"
+      ARM_CLIENT_ID: ${{ inputs.environment == 'prod' && (secrets.ARM_CLIENT_ID_PROD || secrets.ARM_CLIENT_ID) || inputs.environment == 'dev' && (secrets.ARM_CLIENT_ID_DEV || secrets.ARM_CLIENT_ID) || (secrets.ARM_CLIENT_ID_NONPROD || secrets.ARM_CLIENT_ID) }}
       ARM_SUBSCRIPTION_ID: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
       ARM_TENANT_ID: "${{ secrets.ARM_TENANT_ID }}"
       ARM_USE_OIDC: true
@@ -79,7 +86,16 @@ jobs:
           terraform_wrapper: false
 
       - name: Terraform Init
-        run: terraform init
+        run: |
+          echo "Initializing Terraform..."
+          if ! terraform init; then
+            echo "❌ Terraform init failed. This might be due to missing OIDC federated identity credentials."
+            echo "📋 To fix this issue:"
+            echo "1. Apply the bootstrap configuration locally first to create OIDC setup"
+            echo "2. Run: cd bootstrap && terraform apply -var-file='environments/dev.tfvars'"
+            echo "3. Then re-run this workflow"
+            exit 1
+          fi
         working-directory: ${{ env.WORKING_DIR }}
 
       - name: Terraform Validate
@@ -113,14 +129,14 @@ jobs:
         id: tf-plan
         run: |
           export exitcode=0
-          
+
           # Build terraform plan command with optional vars file
           PLAN_CMD="terraform plan -detailed-exitcode -no-color -out tfplan"
           if [ -n "${{ inputs.tf_vars_file }}" ] && [ -f "${{ env.WORKING_DIR }}/${{ inputs.tf_vars_file }}" ]; then
             PLAN_CMD="$PLAN_CMD -var-file=${{ inputs.tf_vars_file }}"
             echo "Using vars file: ${{ inputs.tf_vars_file }}"
           fi
-          
+
           eval $PLAN_CMD || export exitcode=$?
           echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
 
@@ -266,7 +282,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       WORKING_DIR: ${{ inputs.working_dir != '' && inputs.working_dir || 'infra' }}
-      ARM_CLIENT_ID: "${{ secrets.ARM_CLIENT_ID }}"
+      ARM_CLIENT_ID: ${{ inputs.environment == 'prod' && (secrets.ARM_CLIENT_ID_PROD || secrets.ARM_CLIENT_ID) || inputs.environment == 'dev' && (secrets.ARM_CLIENT_ID_DEV || secrets.ARM_CLIENT_ID) || (secrets.ARM_CLIENT_ID_NONPROD || secrets.ARM_CLIENT_ID) }}
       ARM_SUBSCRIPTION_ID: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
       ARM_TENANT_ID: "${{ secrets.ARM_TENANT_ID }}"
       ARM_USE_OIDC: true
@@ -299,7 +315,16 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        run: terraform init
+        run: |
+          echo "Initializing Terraform..."
+          if ! terraform init; then
+            echo "❌ Terraform init failed. This might be due to missing OIDC federated identity credentials."
+            echo "📋 To fix this issue:"
+            echo "1. Apply the bootstrap configuration locally first to create OIDC setup"
+            echo "2. Run: cd bootstrap && terraform apply -var-file='environments/dev.tfvars'"
+            echo "3. Then re-run this workflow"
+            exit 1
+          fi
         working-directory: ${{ env.WORKING_DIR }}
 
       - name: Terraform Validate

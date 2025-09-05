@@ -18,6 +18,34 @@ This directory contains the bootstrap Terraform configuration that sets up the f
 - Terraform >= 1.6 installed
 - Appropriate Azure permissions (Global Administrator or equivalent)
 
+## Quick Start (Recommended)
+
+For the initial bootstrap setup, use the automated setup script:
+
+```bash
+# Navigate to bootstrap directory
+cd bootstrap
+
+# Set environment variables (choose your platform)
+# Windows (PowerShell):
+$env:TF_VAR_tenant_id="f5222e6c-5fc6-48eb-8f03-73db18203b63"
+$env:TF_VAR_subscription_id="bba7ddf1-057e-4d04-afd9-4032cd79dc9d"
+
+# Linux/macOS:
+export TF_VAR_tenant_id="f5222e6c-5fc6-48eb-8f03-73db18203b63"
+export TF_VAR_subscription_id="bba7ddf1-057e-4d04-afd9-4032cd79dc9d"
+
+# Login to Azure
+az login
+
+# Run the setup script
+./setup.sh
+```
+
+This script will set up OIDC federated credentials for all environments (dev, test, stage, prod).
+
+## Manual Setup (Alternative)
+
 ## Local Development
 
 ### Initial Setup
@@ -31,16 +59,16 @@ This directory contains the bootstrap Terraform configuration that sets up the f
 2. **Set Required Environment Variables:**
    ```bash
    # Windows (PowerShell)
-   $env:TF_VAR_tenant_id="your-tenant-id"
-   $env:TF_VAR_subscription_id="your-subscription-id"
+   $env:TF_VAR_tenant_id="f5222e6c-5fc6-48eb-8f03-73db18203b63"
+   $env:TF_VAR_subscription_id="bba7ddf1-057e-4d04-afd9-4032cd79dc9d"
 
    # Windows (CMD)
-   set TF_VAR_tenant_id=your-tenant-id
-   set TF_VAR_subscription_id=your-subscription-id
+   set TF_VAR_tenant_id=f5222e6c-5fc6-48eb-8f03-73db18203b63
+   set TF_VAR_subscription_id=bba7ddf1-057e-4d04-afd9-4032cd79dc9d
 
    # Linux/macOS
-   export TF_VAR_tenant_id="your-tenant-id"
-   export TF_VAR_subscription_id="your-subscription-id"
+   export TF_VAR_tenant_id="f5222e6c-5fc6-48eb-8f03-73db18203b63"
+   export TF_VAR_subscription_id="bba7ddf1-057e-4d04-afd9-4032cd79dc9d"
    ```
 
 ### Running Terraform Commands
@@ -139,7 +167,9 @@ terraform output github_secrets
 ```
 
 Required secrets:
-- `ARM_CLIENT_ID` - Azure AD Application Client ID
+- `ARM_CLIENT_ID_DEV` - Client ID for Dev SP (dev app)
+- `ARM_CLIENT_ID_NONPROD` - Client ID for Nonprod SP (test + stage app)
+- `ARM_CLIENT_ID_PROD` - Client ID for Prod SP (prod app)
 - `ARM_SUBSCRIPTION_ID` - Azure Subscription ID
 - `ARM_TENANT_ID` - Azure Tenant ID
 - `GH_PAT` - GitHub Personal Access Token
