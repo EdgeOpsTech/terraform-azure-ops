@@ -40,7 +40,7 @@ jobs:
     with:
       working_dir: ${{ github.event_name == 'workflow_dispatch' && inputs.working_dir || 'infra' }}
       environment: "dev"
-      tf_vars_file: "environments/dev.tfvars"
+      # tf_vars_file removed - automatically uses environments/dev.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
       ARM_CLIENT_ID_NONPROD: ${{ secrets.ARM_CLIENT_ID_NONPROD }}
@@ -50,7 +50,7 @@ jobs:
       GH_PAT: ${{ secrets.GH_PAT }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
-  # Deploy to TEST environment (temporarily using dev until test OIDC is set up)
+  # Deploy to TEST environment
   deploy-test:
     if: |
       (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
@@ -59,8 +59,8 @@ jobs:
     uses: ./.github/workflows/tf-plan-apply.yml
     with:
       working_dir: ${{ github.event_name == 'workflow_dispatch' && inputs.working_dir || 'infra' }}
-      environment: "dev"  # Temporarily use dev until test OIDC credentials are created
-      tf_vars_file: "environments/test.tfvars"
+      environment: "test"
+      # tf_vars_file removed - automatically uses environments/test.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
       ARM_CLIENT_ID_NONPROD: ${{ secrets.ARM_CLIENT_ID_NONPROD }}
@@ -80,7 +80,7 @@ jobs:
     with:
       working_dir: ${{ github.event_name == 'workflow_dispatch' && inputs.working_dir || 'infra' }}
       environment: "stage"
-      tf_vars_file: "environments/stage.tfvars"
+      # tf_vars_file removed - automatically uses environments/stage.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
       ARM_CLIENT_ID_NONPROD: ${{ secrets.ARM_CLIENT_ID_NONPROD }}
@@ -99,7 +99,7 @@ jobs:
     with:
       working_dir: ${{ github.event_name == 'workflow_dispatch' && inputs.working_dir || 'infra' }}
       environment: "prod"
-      tf_vars_file: "environments/prod.tfvars"
+      # tf_vars_file removed - automatically uses environments/prod.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
       ARM_CLIENT_ID_NONPROD: ${{ secrets.ARM_CLIENT_ID_NONPROD }}
@@ -118,7 +118,7 @@ jobs:
     with:
       working_dir: "infra"
       environment: "prod"
-      tf_vars_file: "environments/prod.tfvars"
+      # tf_vars_file removed - automatically uses environments/prod.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
       ARM_CLIENT_ID_NONPROD: ${{ secrets.ARM_CLIENT_ID_NONPROD }}

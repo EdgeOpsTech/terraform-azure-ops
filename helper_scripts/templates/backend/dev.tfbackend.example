@@ -1,0 +1,8 @@
+# Backend configuration for DEV environment
+# Replace these values with outputs from your bootstrap deployment
+
+resource_group_name  = "rg-tfstate"
+storage_account_name = "YOUR_STORAGE_ACCOUNT_NAME"  # From bootstrap output
+container_name       = "YOUR_REPOSITORY_CONTAINER"   # From bootstrap output
+key                  = "dev.tfstate"
+use_oidc             = true
