@@ -12,6 +12,7 @@ output "arm_subscription_id" {
 output "arm_tenant_id" {
   description = "Azure Tenant ID"
   value       = var.tenant_id
+  sensitive   = true
 }
 
 # Storage Account Information
@@ -54,6 +55,7 @@ output "github_secrets" {
     ARM_SUBSCRIPTION_ID = data.azurerm_subscription.current.subscription_id
     ARM_TENANT_ID       = var.tenant_id
   }
+  sensitive = true
 }
 
 # Service Principal Information

@@ -55,7 +55,7 @@ variable "github_owner" {
   default     = "EdgeOpsTech"
 
   validation {
-    condition     = can(regex("^[a-zA-Z0-9]([a-zA-Z0-9]|-(?!-))*$", var.github_owner))
+    condition     = can(regex("^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$", var.github_owner))
     error_message = "GitHub owner must be a valid GitHub username or organization name."
   }
 }
