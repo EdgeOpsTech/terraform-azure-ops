@@ -13,6 +13,14 @@ on:
         required: false
         type: string
         default: "infra"
+      environment:
+        required: false
+        type: string
+        default: "dev"
+      tf_vars_file:
+        required: false
+        type: string
+        default: ""
     secrets:
       ARM_CLIENT_ID:
         required: true
@@ -105,8 +113,15 @@ jobs:
         id: tf-plan
         run: |
           export exitcode=0
-          terraform plan -detailed-exitcode -no-color -out tfplan || export exitcode=$?
-
+          
+          # Build terraform plan command with optional vars file
+          PLAN_CMD="terraform plan -detailed-exitcode -no-color -out tfplan"
+          if [ -n "${{ inputs.tf_vars_file }}" ] && [ -f "${{ env.WORKING_DIR }}/${{ inputs.tf_vars_file }}" ]; then
+            PLAN_CMD="$PLAN_CMD -var-file=${{ inputs.tf_vars_file }}"
+            echo "Using vars file: ${{ inputs.tf_vars_file }}"
+          fi
+          
+          eval $PLAN_CMD || export exitcode=$?
           echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
 
           if [ $exitcode -eq 1 ]; then
@@ -260,7 +275,7 @@ jobs:
       ARM_SKIP_PROVIDER_REGISTRATION: true
       GITHUB_TOKEN: ${{ secrets.GH_PAT }}
       TF_VAR_github_token: ${{ secrets.GH_PAT }}
-    environment: dev
+    environment: ${{ inputs.environment }}
     needs: [terraform-plan]
 
     steps:
