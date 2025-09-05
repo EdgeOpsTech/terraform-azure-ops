@@ -48,7 +48,7 @@ jobs:
       GH_PAT: ${{ secrets.GH_PAT }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
-  # Deploy to TEST environment
+  # Deploy to TEST environment (temporarily using dev until test OIDC is set up)
   deploy-test:
     if: |
       (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
@@ -57,7 +57,7 @@ jobs:
     uses: ./.github/workflows/tf-plan-apply.yml
     with:
       working_dir: ${{ github.event_name == 'workflow_dispatch' && inputs.working_dir || 'infra' }}
-      environment: "test"
+      environment: "dev"  # Temporarily use dev until test OIDC credentials are created
       tf_vars_file: "environments/test.tfvars"
     secrets:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
