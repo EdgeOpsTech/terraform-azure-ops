@@ -1,14 +1,16 @@
+# Backend Configuration Template
+# Copy this to your infrastructure repository's providers.tf
+
 terraform {
   required_version = ">= 1.6"
 
   backend "azurerm" {
-    # Bootstrap backend configuration will be provided via -backend-config flag
-    # Use: terraform init -backend-config=backend/bootstrap-<env>.tfbackend
-    # Note: For initial setup, run without backend first, then migrate state
+    # Backend configuration will be provided via -backend-config flag
+    # Create backend/<env>.tfbackend files with the following structure:
     # resource_group_name  = "rg-tfstate"
-    # storage_account_name = "edgeopstechtfstate"
-    # container_name       = "terraform-azure-ops"
-    # key                  = "bootstrap.tfstate"
+    # storage_account_name = "your-storage-account-name"
+    # container_name       = "your-repo-container"
+    # key                  = "<env>.tfstate"
     # use_oidc             = true
   }
 

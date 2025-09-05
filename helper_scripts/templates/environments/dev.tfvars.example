@@ -1,0 +1,15 @@
+# Development Environment Configuration
+# Replace with your actual values
+
+environment     = "dev"
+location        = "East US 2"
+tenant_id       = "YOUR_TENANT_ID"        # From bootstrap output
+subscription_id = "YOUR_SUBSCRIPTION_ID"  # From bootstrap output
+
+# Add your application-specific variables here
+# For example:
+# resource_prefix = "myapp"
+# tags = {
+#   Environment = "dev"
+#   Owner       = "team-name"
+# }

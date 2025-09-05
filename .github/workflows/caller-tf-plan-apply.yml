@@ -40,7 +40,7 @@ jobs:
     with:
       working_dir: "bootstrap"
       environment: "dev"
-      tf_vars_file: "environments/dev.tfvars"
+      # tf_vars_file removed - automatically uses environments/dev.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
       ARM_CLIENT_ID_NONPROD: ${{ secrets.ARM_CLIENT_ID_NONPROD }}
@@ -60,7 +60,7 @@ jobs:
     with:
       working_dir: "bootstrap"
       environment: "test"
-      tf_vars_file: "environments/test.tfvars"
+      # tf_vars_file removed - automatically uses environments/test.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
       ARM_CLIENT_ID_NONPROD: ${{ secrets.ARM_CLIENT_ID_NONPROD }}
@@ -80,7 +80,7 @@ jobs:
     with:
       working_dir: "bootstrap"
       environment: "stage"
-      tf_vars_file: "environments/stage.tfvars"
+      # tf_vars_file removed - automatically uses environments/stage.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
       ARM_CLIENT_ID_NONPROD: ${{ secrets.ARM_CLIENT_ID_NONPROD }}
@@ -98,7 +98,7 @@ jobs:
     with:
       working_dir: "bootstrap"
       environment: "prod"
-      tf_vars_file: "environments/prod.tfvars"
+      # tf_vars_file removed - automatically uses environments/prod.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
       ARM_CLIENT_ID_NONPROD: ${{ secrets.ARM_CLIENT_ID_NONPROD }}

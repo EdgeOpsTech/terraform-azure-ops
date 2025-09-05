@@ -14,7 +14,8 @@
       "Bash(az ad app delete:*)",
       "Read(//c/Users/abina/Pictures/Screenshots/**)",
       "Bash(az storage account list:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

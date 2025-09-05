@@ -1,0 +1,8 @@
+# Bootstrap Backend Configuration for STAGE environment
+# This backend configuration is for the bootstrap deployment itself
+
+resource_group_name  = "rg-tfstate"
+storage_account_name = "edgeopstechtfstate"    # This will be created by initial bootstrap run
+container_name       = "terraform-azure-ops"   # Same container, different key
+key                  = "bootstrap-stage.tfstate"
+use_oidc             = true
