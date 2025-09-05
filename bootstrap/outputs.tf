@@ -5,12 +5,12 @@ output "multi_app_client_ids" {
   description = "Client IDs for all created Azure AD applications"
   value = {
     for app_key, app in azuread_application.github_oidc_multi : app_key => {
-      client_id = app.client_id
+      client_id      = app.client_id
       application_id = app.id
-      display_name = app.display_name
-      environments = local.needed_apps[app_key].environments
-      branches = local.needed_apps[app_key].branches
-      include_pr = local.needed_apps[app_key].include_pr
+      display_name   = app.display_name
+      environments   = local.needed_apps[app_key].environments
+      branches       = local.needed_apps[app_key].branches
+      include_pr     = local.needed_apps[app_key].include_pr
     }
   }
 }
@@ -34,9 +34,9 @@ output "multi_app_backend_config" {
       container_name       = lower(replace(replace(replace(repo, "[^a-zA-Z0-9-]", "-"), "--+", "-"), "^-|-$", ""))
       key                  = "terraform.tfstate"
       subscription_id      = var.subscription_id
-      tenant_id           = var.tenant_id
+      tenant_id            = var.tenant_id
       # For backend config, use the first available client ID (repos can use any app)
-      client_id           = try(values(azuread_application.github_oidc_multi)[0].client_id, "")
+      client_id = try(values(azuread_application.github_oidc_multi)[0].client_id, "")
     }
   }
 }
@@ -51,8 +51,8 @@ output "multi_app_github_secrets" {
       ARM_SUBSCRIPTION_ID = var.subscription_id
       ARM_TENANT_ID       = var.tenant_id
       environments        = local.needed_apps[app_key].environments
-      branches           = local.needed_apps[app_key].branches
-      description        = local.needed_apps[app_key].description
+      branches            = local.needed_apps[app_key].branches
+      description         = local.needed_apps[app_key].description
     }
   }
 }
@@ -64,17 +64,17 @@ output "multi_app_setup_summary" {
     total_applications = length(azuread_application.github_oidc_multi)
     applications = {
       for app_key, config in local.needed_apps : app_key => {
-        name = "github-${var.github_owner}-terraform-${config.name_suffix}"
-        purpose = config.description
-        environments = config.environments
-        branches = config.branches
-        handles_pr = config.include_pr
+        name                 = "github-${var.github_owner}-terraform-${config.name_suffix}"
+        purpose              = config.description
+        environments         = config.environments
+        branches             = config.branches
+        handles_pr           = config.include_pr
         managed_environments = length(setintersection(var.environments, config.environments))
-        managed_branches = length([for branch in var.branches : branch if contains(config.branches, branch)])
-        handles_repos = length(var.github_repo)
+        managed_branches     = length([for branch in var.branches : branch if contains(config.branches, branch)])
+        handles_repos        = length(var.github_repo)
       }
     }
     total_repositories = length(var.github_repo)
-    repositories = var.github_repo
+    repositories       = var.github_repo
   }
 }
