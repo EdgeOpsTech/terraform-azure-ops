@@ -41,7 +41,7 @@ resource "azuread_application_federated_identity_credential" "environments" {
     for item in flatten([
       for repo in var.github_repo : [
         for env in var.environments : {
-          key = "${repo}-${env}"
+          key  = "${repo}-${env}"
           repo = repo
           env  = env
         }
