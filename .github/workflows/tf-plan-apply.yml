@@ -23,11 +23,13 @@ on:
         default: ""
     secrets:
       ARM_CLIENT_ID_DEV:
-        required: true
+        required: false
       ARM_CLIENT_ID_NONPROD:
-        required: true
+        required: false
       ARM_CLIENT_ID_PROD:
-        required: true
+        required: false
+      ARM_CLIENT_ID: # legacy fallback
+        required: false
       ARM_SUBSCRIPTION_ID:
         required: true
       ARM_TENANT_ID:
@@ -49,7 +51,7 @@ jobs:
     environment: ${{ inputs.environment }}
     env:
       WORKING_DIR: ${{ inputs.working_dir != '' && inputs.working_dir || 'infra' }}
-      ARM_CLIENT_ID: ${{ inputs.environment == 'prod' && secrets.ARM_CLIENT_ID_PROD || inputs.environment == 'dev' && secrets.ARM_CLIENT_ID_DEV || secrets.ARM_CLIENT_ID_NONPROD }}
+      ARM_CLIENT_ID: ${{ inputs.environment == 'prod' && (secrets.ARM_CLIENT_ID_PROD || secrets.ARM_CLIENT_ID) || inputs.environment == 'dev' && (secrets.ARM_CLIENT_ID_DEV || secrets.ARM_CLIENT_ID) || (secrets.ARM_CLIENT_ID_NONPROD || secrets.ARM_CLIENT_ID) }}
       ARM_SUBSCRIPTION_ID: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
       ARM_TENANT_ID: "${{ secrets.ARM_TENANT_ID }}"
       ARM_USE_OIDC: true
@@ -280,7 +282,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       WORKING_DIR: ${{ inputs.working_dir != '' && inputs.working_dir || 'infra' }}
-      ARM_CLIENT_ID: ${{ inputs.environment == 'prod' && secrets.ARM_CLIENT_ID_PROD || inputs.environment == 'dev' && secrets.ARM_CLIENT_ID_DEV || secrets.ARM_CLIENT_ID_NONPROD }}
+      ARM_CLIENT_ID: ${{ inputs.environment == 'prod' && (secrets.ARM_CLIENT_ID_PROD || secrets.ARM_CLIENT_ID) || inputs.environment == 'dev' && (secrets.ARM_CLIENT_ID_DEV || secrets.ARM_CLIENT_ID) || (secrets.ARM_CLIENT_ID_NONPROD || secrets.ARM_CLIENT_ID) }}
       ARM_SUBSCRIPTION_ID: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
       ARM_TENANT_ID: "${{ secrets.ARM_TENANT_ID }}"
       ARM_USE_OIDC: true
