@@ -2,26 +2,26 @@ name: "Bootstrap Multi-Environment Deployment"
 
 on:
   # Temporarily disabled - bootstrap must be run manually first to create OIDC credentials
-  # push:
-  #   branches:
-  #     - dev        # Deploy to dev environment
-  #     - main       # Deploy to test environment
-  #     - 'release/**' # Deploy to stage and prod environments
-  #   paths:
-  #     - 'bootstrap/**'
-  # pull_request:
-  #   branches:
-  #     - dev
-  #     - main
-  #     - 'release/**'
-  #   paths:
-  #     - 'bootstrap/**'
+  push:
+    branches:
+      - dev # Deploy to dev environment
+      - main # Deploy to test environment
+      - "release/**" # Deploy to stage and prod environments
+    paths:
+      - "bootstrap/**"
+  pull_request:
+    branches:
+      - dev
+      - main
+      - "release/**"
+    paths:
+      - "bootstrap/**"
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy bootstrap to'
+        description: "Environment to deploy bootstrap to"
         required: true
-        default: 'dev'
+        default: "dev"
         type: choice
         options:
           - dev
