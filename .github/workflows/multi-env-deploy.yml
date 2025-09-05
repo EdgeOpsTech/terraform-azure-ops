@@ -1,4 +1,4 @@
-name: "Bootstrap Multi-Environment Deployment"
+name: "Multi-Environment Terraform Deployment"
 
 on:
   push:
@@ -6,19 +6,15 @@ on:
       - dev        # Deploy to dev environment
       - main       # Deploy to test environment
       - 'release/**' # Deploy to stage and prod environments
-    paths:
-      - 'bootstrap/**'
   pull_request:
     branches:
       - dev
       - main
       - 'release/**'
-    paths:
-      - 'bootstrap/**'
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy bootstrap to'
+        description: 'Environment to deploy to'
         required: true
         default: 'dev'
         type: choice
@@ -27,17 +23,22 @@ on:
           - test
           - stage
           - prod
+      working_dir:
+        description: 'Working directory'
+        required: false
+        default: 'infra'
+        type: string
 
 jobs:
   # Deploy to DEV environment
-  bootstrap-dev:
+  deploy-dev:
     if: |
       (github.ref == 'refs/heads/dev' && github.event_name == 'push') ||
       (github.event_name == 'pull_request' && github.base_ref == 'dev') ||
       (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev')
     uses: ./.github/workflows/tf-plan-apply.yml
     with:
-      working_dir: "bootstrap"
+      working_dir: ${{ github.event_name == 'workflow_dispatch' && inputs.working_dir || 'infra' }}
       environment: "dev"
       tf_vars_file: "environments/dev.tfvars"
     secrets:
@@ -48,14 +49,14 @@ jobs:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
   # Deploy to TEST environment
-  bootstrap-test:
+  deploy-test:
     if: |
       (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
       (github.event_name == 'pull_request' && github.base_ref == 'main') ||
       (github.event_name == 'workflow_dispatch' && inputs.environment == 'test')
     uses: ./.github/workflows/tf-plan-apply.yml
     with:
-      working_dir: "bootstrap"
+      working_dir: ${{ github.event_name == 'workflow_dispatch' && inputs.working_dir || 'infra' }}
       environment: "test"
       tf_vars_file: "environments/test.tfvars"
     secrets:
@@ -66,14 +67,14 @@ jobs:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
   # Deploy to STAGE environment
-  bootstrap-stage:
+  deploy-stage:
     if: |
       (startsWith(github.ref, 'refs/heads/release/') && github.event_name == 'push') ||
       (github.event_name == 'pull_request' && startsWith(github.base_ref, 'release/')) ||
       (github.event_name == 'workflow_dispatch' && inputs.environment == 'stage')
     uses: ./.github/workflows/tf-plan-apply.yml
     with:
-      working_dir: "bootstrap"
+      working_dir: ${{ github.event_name == 'workflow_dispatch' && inputs.working_dir || 'infra' }}
       environment: "stage"
       tf_vars_file: "environments/stage.tfvars"
     secrets:
@@ -83,13 +84,31 @@ jobs:
       GH_PAT: ${{ secrets.GH_PAT }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
-  # Deploy to PROD environment (manual dispatch only)
-  bootstrap-prod:
+  # Deploy to PROD environment (requires stage to complete first for release branches)
+  deploy-prod:
     if: |
       (github.event_name == 'workflow_dispatch' && inputs.environment == 'prod')
+    needs: [deploy-stage]  # Only run after stage completes for release branches
     uses: ./.github/workflows/tf-plan-apply.yml
     with:
-      working_dir: "bootstrap"
+      working_dir: ${{ github.event_name == 'workflow_dispatch' && inputs.working_dir || 'infra' }}
+      environment: "prod"
+      tf_vars_file: "environments/prod.tfvars"
+    secrets:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      GH_PAT: ${{ secrets.GH_PAT }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+  # Alternative PROD deployment for release branches (runs after stage)
+  deploy-prod-release:
+    if: |
+      (startsWith(github.ref, 'refs/heads/release/') && github.event_name == 'push')
+    needs: [deploy-stage]
+    uses: ./.github/workflows/tf-plan-apply.yml
+    with:
+      working_dir: "infra"
       environment: "prod"
       tf_vars_file: "environments/prod.tfvars"
     secrets:

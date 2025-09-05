@@ -5,7 +5,7 @@ terraform {
     resource_group_name  = "rg-tfstate"
     storage_account_name = "edgeopstechtfstate"
     container_name       = "terraform-azure-ops"
-    key                  = "bootstrap-tfstate.tfstate"
+    key                  = "bootstrap.tfstate"
     use_oidc             = true
     client_id            = "fb40e7aa-7931-4675-9295-b0d7620ebf9a"
   }
@@ -24,4 +24,14 @@ terraform {
       version = "~> 3.6"
     }
   }
+}
+
+provider "azurerm" {
+  features {}
+  tenant_id       = var.tenant_id
+  subscription_id = var.subscription_id
+}
+
+provider "azuread" {
+  tenant_id = var.tenant_id
 }
