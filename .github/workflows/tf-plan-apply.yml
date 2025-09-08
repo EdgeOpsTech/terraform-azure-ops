@@ -213,7 +213,7 @@ jobs:
             exit 0
           fi
 
-          terraform show "$PLAN_PATH" > tf_output.txt 2>/dev/null
+          terraform show -no-color "$PLAN_PATH" > tf_output.txt 2>/dev/null
           if [ $? -ne 0 ]; then
             echo "summary<<EOF" >> $GITHUB_OUTPUT
             echo "⚠️ tfplan exists but could not be parsed." >> $GITHUB_OUTPUT
