@@ -40,6 +40,7 @@ jobs:
     with:
       working_dir: "bootstrap"
       environment: "dev"
+      debug_azure_sp: true
       # tf_vars_file removed - automatically uses environments/dev.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
@@ -60,6 +61,7 @@ jobs:
     with:
       working_dir: "bootstrap"
       environment: "test"
+      debug_azure_sp: true
       # tf_vars_file removed - automatically uses environments/test.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
@@ -80,6 +82,7 @@ jobs:
     with:
       working_dir: "bootstrap"
       environment: "stage"
+      debug_azure_sp: true
       # tf_vars_file removed - automatically uses environments/stage.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
@@ -98,6 +101,7 @@ jobs:
     with:
       working_dir: "bootstrap"
       environment: "prod"
+      debug_azure_sp: true
       # tf_vars_file removed - automatically uses environments/prod.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}

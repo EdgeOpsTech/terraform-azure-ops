@@ -32,6 +32,11 @@ on:
         type: string
         default: ""
         description: "Custom tfvars file path (optional - defaults to environments/<env>.tfvars)"
+      debug_azure_sp:
+        required: false
+        type: boolean
+        default: false
+        description: "Enable Azure Service Principal debugging"
     secrets:
       ARM_CLIENT_ID_DEV:
         required: false
@@ -75,6 +80,24 @@ jobs:
       tfplanExitCode: ${{ steps.tf-plan.outputs.exitcode }}
 
     steps:
+      - name: Runner & Authentication Information
+        run: |
+          echo "🖥️  Runner Information:"
+          echo "Runner OS: $RUNNER_OS"
+          echo "Runner Architecture: $RUNNER_ARCH" 
+          echo "Runner Name: $RUNNER_NAME"
+          echo "Hostname: $(hostname)"
+          echo "Working Directory: $(pwd)"
+          echo "GitHub Workspace: $GITHUB_WORKSPACE"
+          echo ""
+          echo "🔑  Azure Authentication:"
+          echo "Environment: ${{ inputs.environment }}"
+          echo "ARM_CLIENT_ID: [CONFIGURED]"
+          echo "ARM_TENANT_ID: [CONFIGURED]"
+          echo "ARM_SUBSCRIPTION_ID: [CONFIGURED]"
+          echo "ARM_USE_OIDC: $ARM_USE_OIDC"
+          echo "=================="
+      
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -95,6 +118,30 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+
+      - name: Verify Azure Service Principal
+        if: ${{ inputs.debug_azure_sp == true }}
+        run: |
+          echo "🔐 Azure Service Principal Info:"
+          
+          # Get SP details if possible
+          CURRENT_SP=$(az account show --query "user.name" --output tsv)
+          if [[ "$CURRENT_SP" != *"@"* ]]; then
+            DISPLAY_NAME=$(az ad sp show --id "$CURRENT_SP" --query "displayName" --output tsv 2>/dev/null || echo "Unknown")
+            echo "Display Name: $DISPLAY_NAME"
+            echo "Environment: ${{ inputs.environment }}"
+          else
+            echo "Display Name: User Account"
+            echo "Environment: ${{ inputs.environment }}"
+          fi
+          echo "===================="
 
       - name: Terraform Init
         run: |
@@ -349,6 +396,24 @@ jobs:
     needs: [terraform-plan]
 
     steps:
+      - name: Runner & Authentication Information
+        run: |
+          echo "🖥️  Runner Information:"
+          echo "Runner OS: $RUNNER_OS"
+          echo "Runner Architecture: $RUNNER_ARCH" 
+          echo "Runner Name: $RUNNER_NAME"
+          echo "Hostname: $(hostname)"
+          echo "Working Directory: $(pwd)"
+          echo "GitHub Workspace: $GITHUB_WORKSPACE"
+          echo ""
+          echo "🔑  Azure Authentication:"
+          echo "Environment: ${{ inputs.environment }}"
+          echo "ARM_CLIENT_ID: [CONFIGURED]"
+          echo "ARM_TENANT_ID: [CONFIGURED]"
+          echo "ARM_SUBSCRIPTION_ID: [CONFIGURED]"
+          echo "ARM_USE_OIDC: $ARM_USE_OIDC"
+          echo "=================="
+      
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -367,6 +432,13 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
 
       - name: Terraform Init
         run: |
