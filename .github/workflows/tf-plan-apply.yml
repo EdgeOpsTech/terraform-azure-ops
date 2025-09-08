@@ -318,7 +318,15 @@ jobs:
 
   terraform-apply:
     name: "Terraform Apply"
-    if: github.ref == 'refs/heads/main' && needs.terraform-plan.outputs.tfplanExitCode == 2
+    if: |
+      needs.terraform-plan.outputs.tfplanExitCode == 2 && (
+        github.ref == 'refs/heads/main' || 
+        github.ref == 'refs/heads/dev' ||
+        (inputs.environment == 'dev' && github.ref == 'refs/heads/dev') ||
+        (inputs.environment == 'test' && github.ref == 'refs/heads/main') ||
+        (inputs.environment == 'stage' && startsWith(github.ref, 'refs/heads/release/')) ||
+        (inputs.environment == 'prod' && github.ref == 'refs/heads/main')
+      )
     runs-on: ubuntu-latest
     env:
       WORKING_DIR: ${{ inputs.working_dir != '' && inputs.working_dir || 'infra' }}
