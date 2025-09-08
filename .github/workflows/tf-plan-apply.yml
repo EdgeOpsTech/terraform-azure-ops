@@ -129,29 +129,17 @@ jobs:
       - name: Verify Azure Service Principal
         if: ${{ inputs.debug_azure_sp == true }}
         run: |
-          echo "🔐 Verifying Azure Service Principal Authentication:"
-          echo "Attempting to authenticate with Azure..."
+          echo "🔐 Azure Service Principal Info:"
           
-          # Show current account information
-          if az account show --output table; then
-            echo ""
-            echo "📋 Current Azure Context:"
-            CURRENT_SP=$(az account show --query "user.name" --output tsv)
-            CURRENT_SUB=$(az account show --query "name" --output tsv)
-            CURRENT_TENANT=$(az account show --query "tenantId" --output tsv)
-            echo "Service Principal: $CURRENT_SP"
-            echo "Subscription: $CURRENT_SUB" 
-            echo "Tenant ID: $CURRENT_TENANT"
-            
-            # Get SP details if possible
-            if [[ "$CURRENT_SP" != *"@"* ]]; then
-              echo ""
-              echo "📝 Service Principal Details:"
-              az ad sp show --id "$CURRENT_SP" --query "{DisplayName:displayName, AppId:appId, ObjectId:id}" --output table 2>/dev/null || echo "Could not retrieve SP details"
-            fi
+          # Get SP details if possible
+          CURRENT_SP=$(az account show --query "user.name" --output tsv)
+          if [[ "$CURRENT_SP" != *"@"* ]]; then
+            DISPLAY_NAME=$(az ad sp show --id "$CURRENT_SP" --query "displayName" --output tsv 2>/dev/null || echo "Unknown")
+            echo "Display Name: $DISPLAY_NAME"
+            echo "Environment: ${{ inputs.environment }}"
           else
-            echo "❌ Azure authentication failed"
-            exit 1
+            echo "Display Name: User Account"
+            echo "Environment: ${{ inputs.environment }}"
           fi
           echo "===================="
 
