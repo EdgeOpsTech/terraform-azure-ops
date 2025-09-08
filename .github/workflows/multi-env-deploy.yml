@@ -40,6 +40,7 @@ jobs:
     with:
       working_dir: ${{ github.event_name == 'workflow_dispatch' && inputs.working_dir || 'infra' }}
       environment: "dev"
+      debug_azure_sp: true
       # tf_vars_file removed - automatically uses environments/dev.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
@@ -60,6 +61,7 @@ jobs:
     with:
       working_dir: ${{ github.event_name == 'workflow_dispatch' && inputs.working_dir || 'infra' }}
       environment: "test"
+      debug_azure_sp: true
       # tf_vars_file removed - automatically uses environments/test.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
@@ -80,6 +82,7 @@ jobs:
     with:
       working_dir: ${{ github.event_name == 'workflow_dispatch' && inputs.working_dir || 'infra' }}
       environment: "stage"
+      debug_azure_sp: true
       # tf_vars_file removed - automatically uses environments/stage.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
@@ -99,6 +102,7 @@ jobs:
     with:
       working_dir: ${{ github.event_name == 'workflow_dispatch' && inputs.working_dir || 'infra' }}
       environment: "prod"
+      debug_azure_sp: true
       # tf_vars_file removed - automatically uses environments/prod.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
@@ -118,6 +122,7 @@ jobs:
     with:
       working_dir: "infra"
       environment: "prod"
+      debug_azure_sp: true
       # tf_vars_file removed - automatically uses environments/prod.tfvars
     secrets:
       ARM_CLIENT_ID_DEV: ${{ secrets.ARM_CLIENT_ID_DEV }}
