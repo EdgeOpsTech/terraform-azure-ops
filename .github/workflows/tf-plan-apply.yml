@@ -75,6 +75,24 @@ jobs:
       tfplanExitCode: ${{ steps.tf-plan.outputs.exitcode }}
 
     steps:
+      - name: Runner & Authentication Information
+        run: |
+          echo "🖥️  Runner Information:"
+          echo "Runner OS: $RUNNER_OS"
+          echo "Runner Architecture: $RUNNER_ARCH" 
+          echo "Runner Name: $RUNNER_NAME"
+          echo "Hostname: $(hostname)"
+          echo "Working Directory: $(pwd)"
+          echo "GitHub Workspace: $GITHUB_WORKSPACE"
+          echo ""
+          echo "🔑  Azure Authentication:"
+          echo "Environment: ${{ inputs.environment }}"
+          echo "ARM_CLIENT_ID: [CONFIGURED]"
+          echo "ARM_TENANT_ID: [CONFIGURED]"
+          echo "ARM_SUBSCRIPTION_ID: [CONFIGURED]"
+          echo "ARM_USE_OIDC: $ARM_USE_OIDC"
+          echo "=================="
+      
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -95,6 +113,34 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
+
+      - name: Verify Azure Service Principal
+        run: |
+          echo "🔐 Verifying Azure Service Principal Authentication:"
+          echo "Attempting to authenticate with Azure..."
+          
+          # Show current account information
+          if az account show --output table; then
+            echo ""
+            echo "📋 Current Azure Context:"
+            CURRENT_SP=$(az account show --query "user.name" --output tsv)
+            CURRENT_SUB=$(az account show --query "name" --output tsv)
+            CURRENT_TENANT=$(az account show --query "tenantId" --output tsv)
+            echo "Service Principal: $CURRENT_SP"
+            echo "Subscription: $CURRENT_SUB" 
+            echo "Tenant ID: $CURRENT_TENANT"
+            
+            # Get SP details if possible
+            if [[ "$CURRENT_SP" != *"@"* ]]; then
+              echo ""
+              echo "📝 Service Principal Details:"
+              az ad sp show --id "$CURRENT_SP" --query "{DisplayName:displayName, AppId:appId, ObjectId:id}" --output table 2>/dev/null || echo "Could not retrieve SP details"
+            fi
+          else
+            echo "❌ Azure authentication failed"
+            exit 1
+          fi
+          echo "===================="
 
       - name: Terraform Init
         run: |
@@ -349,6 +395,24 @@ jobs:
     needs: [terraform-plan]
 
     steps:
+      - name: Runner & Authentication Information
+        run: |
+          echo "🖥️  Runner Information:"
+          echo "Runner OS: $RUNNER_OS"
+          echo "Runner Architecture: $RUNNER_ARCH" 
+          echo "Runner Name: $RUNNER_NAME"
+          echo "Hostname: $(hostname)"
+          echo "Working Directory: $(pwd)"
+          echo "GitHub Workspace: $GITHUB_WORKSPACE"
+          echo ""
+          echo "🔑  Azure Authentication:"
+          echo "Environment: ${{ inputs.environment }}"
+          echo "ARM_CLIENT_ID: [CONFIGURED]"
+          echo "ARM_TENANT_ID: [CONFIGURED]"
+          echo "ARM_SUBSCRIPTION_ID: [CONFIGURED]"
+          echo "ARM_USE_OIDC: $ARM_USE_OIDC"
+          echo "=================="
+      
       - name: Checkout
         uses: actions/checkout@v4
 
