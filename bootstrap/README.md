@@ -29,11 +29,11 @@ cd bootstrap
 # Set environment variables (choose your platform)
 # Windows (PowerShell):
 $env:TF_VAR_tenant_id="f5222e6c-5fc6-48eb-8f03-73db18203b63"
-$env:TF_VAR_subscription_id="bba7ddf1-057e-4d04-afd9-4032cd79dc9d"
+$env:TF_VAR_subscription_id="57d390f5-f0dd-4db6-beba-16712e21d0fc"
 
 # Linux/macOS:
 export TF_VAR_tenant_id="f5222e6c-5fc6-48eb-8f03-73db18203b63"
-export TF_VAR_subscription_id="bba7ddf1-057e-4d04-afd9-4032cd79dc9d"
+export TF_VAR_subscription_id="57d390f5-f0dd-4db6-beba-16712e21d0fc"
 
 # Login to Azure
 az login
@@ -60,15 +60,15 @@ This script will set up OIDC federated credentials for all environments (dev, te
    ```bash
    # Windows (PowerShell)
    $env:TF_VAR_tenant_id="f5222e6c-5fc6-48eb-8f03-73db18203b63"
-   $env:TF_VAR_subscription_id="bba7ddf1-057e-4d04-afd9-4032cd79dc9d"
+   $env:TF_VAR_subscription_id="57d390f5-f0dd-4db6-beba-16712e21d0fc"
 
    # Windows (CMD)
    set TF_VAR_tenant_id=f5222e6c-5fc6-48eb-8f03-73db18203b63
-   set TF_VAR_subscription_id=bba7ddf1-057e-4d04-afd9-4032cd79dc9d
+   set TF_VAR_subscription_id=57d390f5-f0dd-4db6-beba-16712e21d0fc
 
    # Linux/macOS
    export TF_VAR_tenant_id="f5222e6c-5fc6-48eb-8f03-73db18203b63"
-   export TF_VAR_subscription_id="bba7ddf1-057e-4d04-afd9-4032cd79dc9d"
+   export TF_VAR_subscription_id="57d390f5-f0dd-4db6-beba-16712e21d0fc"
    ```
 
 ### Running Terraform Commands

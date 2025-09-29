@@ -8,7 +8,7 @@ echo "=================================="
 
 # Set environment variables
 export TF_VAR_tenant_id="${TF_VAR_tenant_id:-f5222e6c-5fc6-48eb-8f03-73db18203b63}"
-export TF_VAR_subscription_id="${TF_VAR_subscription_id:-bba7ddf1-057e-4d04-afd9-4032cd79dc9d}"
+export TF_VAR_subscription_id="${TF_VAR_subscription_id:-57d390f5-f0dd-4db6-beba-16712e21d0fc}"
 
 echo "✅ Environment variables set"
 

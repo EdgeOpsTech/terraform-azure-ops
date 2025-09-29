@@ -21,14 +21,16 @@ variable "tenant_id" {
 variable "subscription_id" {
   type        = string
   description = "Azure subscription ID"
-  default     = "bba7ddf1-057e-4d04-afd9-4032cd79dc9d"
-  sensitive   = true
+  # default     = "bba7ddf1-057e-4d04-afd9-4032cd79dc9d"
+  default   = "57d390f5-f0dd-4db6-beba-16712e21d0fc"
+  sensitive = true
 }
 
 variable "location" {
   type        = string
   description = "Azure region to deploy resources"
-  default     = "eastus"
+  # default     = "eastus"  # Old region - not allowed by policy
+  default = "westus3" # New allowed region
 }
 
 variable "resource_group_name" {

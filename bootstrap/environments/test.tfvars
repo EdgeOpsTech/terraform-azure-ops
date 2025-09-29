@@ -1,5 +1,6 @@
 environment = "test"
-location    = "eastus"
+# location    = "eastus"
+location = "westus3"
 
 # GitHub Configuration
 github_owner = "EdgeOpsTech"

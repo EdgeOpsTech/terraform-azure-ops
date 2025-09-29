@@ -3,6 +3,12 @@
 
 *.log
 
+# Claude AI related files
+.claude
+.claude/
+**/.claude
+**/.claude/
+
 # .tfstate files
 *.tfstate
 *.tfstate.*
@@ -36,4 +42,5 @@ override.tf.json
 
 # Ignore CLI configuration files
 .terraformrc
+terraform.rc
 terraform.rc

@@ -14,7 +14,7 @@ fi
 export ARM_USE_OIDC=true
 export ARM_CLIENT_ID="80fe8753-50ba-4d1e-84e7-bc9711ef7429"
 export ARM_TENANT_ID="78b776c8-c1c5-4f5b-b46e-4dcd278720b5"
-export ARM_SUBSCRIPTION_ID="bba7ddf1-057e-4d04-afd9-4032cd79dc9d"
+export ARM_SUBSCRIPTION_ID="57d390f5-f0dd-4db6-beba-16712e21d0fc"
 echo "✅ Environment variables set"
 
 # Clean Terraform state to remove Azure AD resources (we'll skip them)
@@ -68,7 +68,7 @@ az storage container create \
 
 # Get service principal ID and assign roles
 SP_ID="3d2f9979-65ef-40a2-80ee-f128bf5bf47c"
-STORAGE_ACCOUNT_ID="/subscriptions/bba7ddf1-057e-4d04-afd9-4032cd79dc9d/resourceGroups/rg-tfstate/providers/Microsoft.Storage/storageAccounts/edgeopstechtfstate"
+STORAGE_ACCOUNT_ID="/subscriptions/57d390f5-f0dd-4db6-beba-16712e21d0fc/resourceGroups/rg-tfstate/providers/Microsoft.Storage/storageAccounts/edgeopstechtfstate"
 
 echo "🔐 Assigning roles..."
 az role assignment create \
@@ -79,12 +79,12 @@ az role assignment create \
 az role assignment create \
     --assignee "$SP_ID" \
     --role "Contributor" \
-    --subscription "bba7ddf1-057e-4d04-afd9-4032cd79dc9d" || true
+    --subscription "57d390f5-f0dd-4db6-beba-16712e21d0fc" || true
 
 az role assignment create \
     --assignee "$SP_ID" \
     --role "User Access Administrator" \
-    --subscription "bba7ddf1-057e-4d04-afd9-4032cd79dc9d" || true
+    --subscription "57d390f5-f0dd-4db6-beba-16712e21d0fc" || true
 
 echo ""
 echo "🎉 Storage infrastructure created successfully!"

@@ -31,7 +31,7 @@ print_info "Assigning Storage Blob Data Contributor role to current user..."
 
 # Set subscription (get from storage account or ask user)
 print_info "Setting Azure subscription context..."
-SUBSCRIPTION_ID="bba7ddf1-057e-4d04-afd9-4032cd79dc9d"
+SUBSCRIPTION_ID="57d390f5-f0dd-4db6-beba-16712e21d0fc"
 
 # Set the subscription
 az account set --subscription "$SUBSCRIPTION_ID"
