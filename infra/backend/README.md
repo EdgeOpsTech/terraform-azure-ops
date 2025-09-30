@@ -129,7 +129,7 @@ terraform force-unlock <LOCK_ID>
 1. Ensure you're authenticated to Azure:
    ```bash
    az login
-   az account set --subscription "bba7ddf1-057e-4d04-afd9-4032cd79dc9d"
+   az account set --subscription "57d390f5-f0dd-4db6-beba-16712e21d0fc"
    ```
 
 2. Verify storage account access:

@@ -24,6 +24,6 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "example" {
   name     = "edgeopstech-rg-infra"
-  location = "eastus"
+  location = var.location
 }
 

@@ -16,7 +16,7 @@ fi
 export ARM_USE_OIDC=true
 export ARM_CLIENT_ID="80fe8753-50ba-4d1e-84e7-bc9711ef7429"
 export ARM_TENANT_ID="78b776c8-c1c5-4f5b-b46e-4dcd278720b5"
-export ARM_SUBSCRIPTION_ID="bba7ddf1-057e-4d04-afd9-4032cd79dc9d"
+export ARM_SUBSCRIPTION_ID="57d390f5-f0dd-4db6-beba-16712e21d0fc"
 echo "✅ Environment variables set"
 
 # Remove the entire Azure AD application to start fresh
@@ -66,7 +66,7 @@ if ! terraform state show azurerm_resource_group.tfstate &>/dev/null; then
     echo "📦 Importing existing resource group..."
     # Try to import the resource group - handle if it doesn't exist
     if az group show --name "rg-tfstate" &>/dev/null; then
-        RESOURCE_GROUP_ID="/subscriptions/bba7ddf1-057e-4d04-afd9-4032cd79dc9d/resourceGroups/rg-tfstate"
+        RESOURCE_GROUP_ID="/subscriptions/57d390f5-f0dd-4db6-beba-16712e21d0fc/resourceGroups/rg-tfstate"
         terraform import azurerm_resource_group.tfstate "$RESOURCE_GROUP_ID" || true
     fi
 fi
