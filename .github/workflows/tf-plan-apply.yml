@@ -3,7 +3,7 @@ name: "Terraform Plan/Apply"
 # This workflow supports the new backend configuration structure:
 # - Bootstrap: Uses backend/bootstrap-<env>.tfbackend and environments/<env>.tfvars
 # - Infrastructure: Uses backend/<env>.tfbackend and environments/<env>.tfvars
-# 
+#
 # Usage examples:
 # - Deploy bootstrap to dev: working_dir="bootstrap", environment="dev"
 # - Deploy infra to test: working_dir="infra", environment="test"
@@ -97,7 +97,7 @@ jobs:
           echo "ARM_SUBSCRIPTION_ID: [CONFIGURED]"
           echo "ARM_USE_OIDC: $ARM_USE_OIDC"
           echo "=================="
-      
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -130,7 +130,7 @@ jobs:
         if: ${{ inputs.debug_azure_sp == true }}
         run: |
           echo "🔐 Azure Service Principal Info:"
-          
+
           # Get SP details if possible
           CURRENT_SP=$(az account show --query "user.name" --output tsv)
           if [[ "$CURRENT_SP" != *"@"* ]]; then
@@ -147,20 +147,20 @@ jobs:
         run: |
           echo "Initializing Terraform with backend configuration for ${{ inputs.environment }} environment..."
           BACKEND_CONFIG="backend/${{ inputs.environment }}.tfbackend"
-          
+
           if [ "${{ env.WORKING_DIR }}" = "bootstrap" ]; then
             BACKEND_CONFIG="backend/bootstrap-${{ inputs.environment }}.tfbackend"
           fi
-          
+
           echo "Using backend config: $BACKEND_CONFIG"
-          
+
           if [ ! -f "$BACKEND_CONFIG" ]; then
             echo "❌ Backend configuration file not found: $BACKEND_CONFIG"
             echo "📋 Available backend configs:"
             ls -la backend/ || echo "No backend directory found"
             exit 1
           fi
-          
+
           echo "🚀 Running: terraform init -backend-config=\"$BACKEND_CONFIG\" -input=false"
           if ! terraform init -backend-config="$BACKEND_CONFIG" -input=false; then
             echo "❌ Terraform init failed. This might be due to missing OIDC federated identity credentials."
@@ -206,7 +206,7 @@ jobs:
 
           # Build terraform plan command with environment-specific vars file and colors
           PLAN_CMD="terraform plan -detailed-exitcode -out tfplan -input=false"
-          
+
           # Use custom tf_vars_file if provided, otherwise use environment-specific file
           if [ -n "${{ inputs.tf_vars_file }}" ] && [ -f "${{ inputs.tf_vars_file }}" ]; then
             PLAN_CMD="$PLAN_CMD -var-file=${{ inputs.tf_vars_file }}"
@@ -413,7 +413,7 @@ jobs:
           echo "ARM_SUBSCRIPTION_ID: [CONFIGURED]"
           echo "ARM_USE_OIDC: $ARM_USE_OIDC"
           echo "=================="
-      
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -444,20 +444,20 @@ jobs:
         run: |
           echo "Initializing Terraform with backend configuration for ${{ inputs.environment }} environment..."
           BACKEND_CONFIG="backend/${{ inputs.environment }}.tfbackend"
-          
+
           if [ "${{ env.WORKING_DIR }}" = "bootstrap" ]; then
             BACKEND_CONFIG="backend/bootstrap-${{ inputs.environment }}.tfbackend"
           fi
-          
+
           echo "Using backend config: $BACKEND_CONFIG"
-          
+
           if [ ! -f "$BACKEND_CONFIG" ]; then
             echo "❌ Backend configuration file not found: $BACKEND_CONFIG"
             echo "📋 Available backend configs:"
             ls -la backend/ || echo "No backend directory found"
             exit 1
           fi
-          
+
           echo "🚀 Running: terraform init -backend-config=\"$BACKEND_CONFIG\" -input=false"
           if ! terraform init -backend-config="$BACKEND_CONFIG" -input=false; then
             echo "❌ Terraform init failed. This might be due to missing OIDC federated identity credentials."
