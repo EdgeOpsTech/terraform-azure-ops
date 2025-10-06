@@ -1,0 +1,54 @@
+name: "Terraform Linting and Security Scan"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  lint-and-security:
+    name: Lint and Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Install tflint
+        run: |
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+          tflint --init
+
+      - name: Run tflint
+        run: tflint --recursive
+
+      - name: Install tfsec
+        run: |
+          TFS_VERSION=$(curl -s https://api.github.com/repos/aquasecurity/tfsec/releases/latest | jq -r .tag_name)
+          curl -L -o tfsec https://github.com/aquasecurity/tfsec/releases/download/${TFS_VERSION}/tfsec-linux-amd64
+          chmod +x tfsec
+          sudo mv tfsec /usr/local/bin/
+
+      - name: Install checkov
+        run: |
+          pip install --upgrade pip
+          pip install checkov
+
+      - name: Run checkov
+        run: checkov -d .
+
+      - name: Run tfsec with SARIF output
+        run: |
+          tfsec . --format sarif --out tfsec-results.sarif
+
+      - name: Upload tfsec SARIF results
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: tfsec-results.sarif
